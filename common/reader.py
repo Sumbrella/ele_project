@@ -1,3 +1,5 @@
+from common.unit import SinglePoint
+
 class Reader:
 
     def __init__(self, filename):
@@ -19,7 +21,7 @@ class Reader:
         fp = open(self._filename, 'r')
         def reader():
             points = []
-            #
+
             if len(points) == point_number:
                 pass
 
