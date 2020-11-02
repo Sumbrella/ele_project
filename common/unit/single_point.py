@@ -1,7 +1,7 @@
 from typing import TextIO
 
 import pandas as pd
-import numpy as np
+
 
 class SinglePoint:
 
@@ -23,13 +23,14 @@ class SinglePoint:
             self._y.append(y)
             self._data.append([x, y])
 
-    def plot(self):
+    def plot(self, show=True):
         import matplotlib.pyplot as plt
         df = pd.DataFrame(self._data)
         x = df.iloc[:, 0]
         y = df.iloc[:, 1]
         plt.plot(x, y)
-        plt.show()
+        if show:
+            plt.show()
 
     def get_data(self):
         return self._data

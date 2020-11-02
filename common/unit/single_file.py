@@ -21,7 +21,7 @@ class SingleFile:
         self._point_reader = None
         # public
         path, self.filename = os.path.split(filepath)
-
+        self.filename = self.filename.split('.', 1)[0]
         # init
         self._init_title(self._fp)
         self._init_point_reader()
@@ -70,6 +70,8 @@ class SingleFile:
                 if len(points) is batch_size:
                     yield points
                     points = []
+            if len(points):
+                yield points
 
         return reader
 
