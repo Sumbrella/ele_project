@@ -12,16 +12,24 @@ class SinglePoint:
         self._id = int(id)
 
         for i in range(skip_line):
-            next(fp)
+            fp.readline()
         self._size = eval(fp.readline())
         self._data = []
         self._x = []
         self._y = []
         for i in range(self._size):
-            x, y = map(float, fp.readline().split())
-            self._x.append(x)
-            self._y.append(y)
-            self._data.append([x, y])
+            line = fp.readline()
+            now_position = fp.tell()
+            try:
+                x, y = map(float, line.split())
+                self._x.append(x)
+                self._y.append(y)
+                self._data.append([x, y])
+            except:
+                # 拟合数据中的数据长度不等于self,_size
+                fp.seek(now_position)  # 回到上一行
+                self._size = i   # 更新点的数量
+                break
 
     def plot(self, show=True):
         import matplotlib.pyplot as plt
