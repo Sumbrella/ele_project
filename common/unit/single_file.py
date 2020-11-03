@@ -34,8 +34,16 @@ class SingleFile:
     def date(self):
         return self._date
 
+    @property
+    def point_number(self):
+        return self._point_number
+
+    @property
+    def remind_point_number(self):
+        return self._remind_point_number
+
     def _init_title(self, fp):
-        self._point_number = fp.readline()
+        self._point_number = eval(fp.readline())
         self._remind_point_number = self._point_number
         self._date = fp.readline()
 
