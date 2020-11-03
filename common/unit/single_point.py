@@ -13,13 +13,15 @@ class SinglePoint:
 
         for i in range(skip_line):
             fp.readline()
+
         self._size = eval(fp.readline())
         self._data = []
         self._x = []
         self._y = []
+
         for i in range(self._size):
-            line = fp.readline()
             now_position = fp.tell()
+            line = fp.readline()
             try:
                 x, y = map(float, line.split())
                 self._x.append(x)
@@ -30,6 +32,14 @@ class SinglePoint:
                 fp.seek(now_position)  # 回到上一行
                 self._size = i   # 更新点的数量
                 break
+
+    @property
+    def x(self):
+        return self._x
+
+    @property
+    def y(self):
+        return self._y
 
     def plot(self, show=True):
         import matplotlib.pyplot as plt
