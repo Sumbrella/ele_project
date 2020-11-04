@@ -27,8 +27,10 @@ point.plot()
 
 ### 2. 用对数函数进行图像拟合
 具体函数在`solutions.polyfit.fit_one_point`中。  
-该函数接受一个`SinglePoint`参数，并使用函数
-<a href="https://www.codecogs.com/eqnedit.php?latex=f(x)&space;=&space;a&space;\log(|bx&space;&plus;&space;ep|)&space;&plus;&space;c\log(|dx&plus;ep|)^2&space;&plus;&space;e\log(|fx&plus;ep|)^3&space;&plus;&space;g\log(|hx|&plus;ep)^4&space;&plus;&space;i" target="_blank"><img src="https://latex.codecogs.com/gif.latex?f(x)&space;=&space;a&space;\log(|bx&space;&plus;&space;ep|)&space;&plus;&space;c\log(|dx&plus;ep|)^2&space;&plus;&space;e\log(|fx&plus;ep|)^3&space;&plus;&space;g\log(|hx|&plus;ep)^4&space;&plus;&space;i" title="f(x) = a \log(|bx + ep|) + c\log(|dx+ep|)^2 + e\log(|fx+ep|)^3 + g\log(|hx|+ep)^4 + i" /></a>
+该函数接受一个`SinglePoint`参数，并使用函数  
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=f(x)&space;=&space;a&space;\log(|bx&space;&plus;&space;ep|)&space;&plus;&space;c\log(|dx&plus;ep|)^2&space;&plus;&space;e\log(|fx&plus;ep|)^3&space;&plus;&space;g\log(|hx|&plus;ep)^4&space;&plus;&space;i" target="_blank"><img src="https://latex.codecogs.com/gif.latex?f(x)&space;=&space;a&space;\log(|bx&space;&plus;&space;ep|)&space;&plus;&space;c\log(|dx&plus;ep|)^2&space;&plus;&space;e\log(|fx&plus;ep|)^3&space;&plus;&space;g\log(|hx|&plus;ep)^4&space;&plus;&space;i" title="f(x) = a \log(|bx + ep|) + c\log(|dx+ep|)^2 + e\log(|fx+ep|)^3 + g\log(|hx|+ep)^4 + i" /></a>  
+
 进行拟合。  
 在圆滑后的数据中，可以得到较好的拟合结果。
 ```python
@@ -43,4 +45,12 @@ after_file = SingleFile(after_filepath)
 
 fit_one_point(before_file.get_one_point(), show=True)
 ```
-  
+对圆滑后的数据拟合如下:  
+
+![image](https://github.com/Sumbrella/ele_project/tree/master/else/pic/after_fit_example.png)  
+
+对圆滑前的数据拟合如下:  
+
+![image](https://github.com/Sumbrella/ele_project/tree/master/else/pic/before_fit_example.png)  
+
+**从上面的结果可以看出，直接拟合对圆滑后的图像拟合结果较好，对于圆滑前的图像具有一定的拟合能力，但是并不能满足要求。**
