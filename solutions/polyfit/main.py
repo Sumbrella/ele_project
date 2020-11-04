@@ -1,6 +1,5 @@
-import paddle
 from paddle import fluid
-from paddle.fluid.dygraph.nn import Linear, BatchNorm, Dropout
+from paddle.fluid.dygraph.nn import Linear, Dropout
 
 
 class Network(fluid.dygraph.Layer):
@@ -37,7 +36,6 @@ class Network(fluid.dygraph.Layer):
 
 if __name__ == '__main__':
     from common.unit import SingleFile
-    from solutions.polyfit.fit_one_point import fit_one_point
 
     before_data_path = "../../data/origin/before/LINE_100_dbdt.dat"
     after_data_path = "../../data/origin/after/new_LINE_100_dbdt.dat"

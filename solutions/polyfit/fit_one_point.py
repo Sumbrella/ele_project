@@ -16,7 +16,7 @@ def target_func(input, a, b, c, d, e, f, g, h, i):
     return a * np.log(abs(b * input + ep)) + c * np.log(abs(d * input + ep)) ** 2 + e * np.log(abs(f * input + ep)) ** 3 + g * np.log(abs(h * input + ep)) ** 4 + i
 
 
-def fit_one_point(point:SinglePoint, show=False):
+def fit_point(point:SinglePoint, show=False):
     scaler = MinMaxScaler()
     x_data = np.array(point.x)
     x_data = x_data * 100

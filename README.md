@@ -73,7 +73,7 @@ if __name__ == '__main__':
 在圆滑后的数据中，可以得到较好的拟合结果。
 ```python
 from common.unit import SingleFile
-from solutions.polyfit import fit_one_point
+from solutions import fit_point
 
 before_filepath = "data/origin/before/LINE_100_dbdt.dat"
 after_filepath = "data/origin/after/new_LINE_100_dbdt.dat"
@@ -81,15 +81,16 @@ after_filepath = "data/origin/after/new_LINE_100_dbdt.dat"
 before_file = SingleFile(before_filepath)
 after_file = SingleFile(after_filepath)
 
-fit_one_point(before_file.get_one_point(), show=True)
+fit_point(before_file.get_one_point(), show=True)
+
 ```
 对圆滑后的数据拟合如下:  
 
-![image](https://github.com/Sumbrella/ele_project/tree/master/else/pic/after_fit_example.png)  
+![](https://github.com/Sumbrella/ele_project/tree/master/else/pic/after_fit_example.png)  
 
 对圆滑前的数据拟合如下:  
 
-![image](https://github.com/Sumbrella/ele_project/tree/master/else/pic/before_fit_example.png)  
+![](https://github.com/Sumbrella/ele_project/tree/master/else/pic/before_fit_example.png)  
 
 **从上面的结果可以看出，直接拟合对圆滑后的图像拟合结果较好，对于圆滑前的图像具有一定的拟合能力，但是并不能满足要求。**
 
