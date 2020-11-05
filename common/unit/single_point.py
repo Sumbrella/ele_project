@@ -41,6 +41,10 @@ class SinglePoint:
     def y(self):
         return self._y
 
+    @property
+    def data(self):
+        return self._data
+
     def plot(self, show=True):
         import matplotlib.pyplot as plt
         df = pd.DataFrame(self._data)
@@ -50,8 +54,9 @@ class SinglePoint:
         if show:
             plt.show()
 
-    def get_data(self):
-        return self._data
+    def get_narray(self):
+        import numpy as np
+        return np.array([self.x, self.y])
 
 
 def main():
