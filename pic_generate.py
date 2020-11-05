@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from common.unit import SingleFile
 
-if __name__ == '__main__':
+def generateAllPictures():
     father_dir = os.path.dirname(__file__)
 
     before_data_dir = os.path.join(father_dir, 'data/origin/before')
@@ -34,3 +34,6 @@ if __name__ == '__main__':
                     os.path.join(single_file_path, f'point_{point_id}.jpg')
                 )
                 plt.close()
+
+if __name__ == '__main__':
+    generateAllPictures()
