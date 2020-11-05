@@ -58,7 +58,7 @@ class SingleFile:
                     break
             yield None
 
-        self._point_reader = reader()
+        self._point_reader = reader
 
     def _read_point(self):
 
@@ -69,21 +69,28 @@ class SingleFile:
         return point
 
     def get_reader(self, batch_size=10):
+
         def reader():
             points = []
-            for point_id, point in enumerate(self.point_reader):
+            for point_id, point in enumerate(self.point_reader()):
+
+                if point is None:
+                    break
+
                 points.append(point)
 
                 if len(points) is batch_size:
                     yield points
                     points = []
+
+
             if len(points):
                 yield points
 
         return reader
 
     def get_one_point(self) -> SinglePoint:
-        point = next(self.point_reader)
+        point = next(self.point_reader())
         if point is None:
             raise ValueError('No more point in this file')
         return point

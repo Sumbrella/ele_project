@@ -73,8 +73,12 @@ if __name__ == '__main__':
     gatem_results = np.abs(np.loadtxt('gatem_hf-df-Bz.dat'))
     times = gatem_results[:, 0]
     L_square = 1
-    depth = [100, ]
-    res = [1e2, 1e2]
+    # === ORIGIN ===
+    # depth = [100, ]
+    # res = [1e2, 1e2, ]
+    depth = [400, 10000,]
+    res = [1e5, 1, 1e3]
+
     EM_b, EM_db = loop_tem1d(times, L_square, depth, res, verb_flag=0)
 
     plt.figure(figsize=(9, 5))
@@ -82,11 +86,11 @@ if __name__ == '__main__':
     plt.title('Model Result')
 
     # empymod
-    plt.plot(times, np.abs(gatem_results[:, 1]), 'b', label="GATEM_Fwd1D")
+    # plt.plot(times, np.abs(gatem_results[:, 1]), 'b', label="GATEM_Fwd1D")
     plt.plot(times, np.abs(EM_db), 'r--', label="empymod")
 
     # Plot settings
-    # plt.xscale('log')
+    plt.xscale('log')
     # plt.yscale('log')
     plt.xlabel("Time(s)")
     plt.ylabel(r"$\mathrm{B}_\mathrm{z}$")

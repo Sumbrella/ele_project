@@ -12,28 +12,35 @@ def generateAllPictures():
     batch_size = 10
 
     figures_dir = os.path.join(os.path.join(father_dir, 'data'), 'figures')
+
     if not os.path.exists(figures_dir):
         os.mkdir(figures_dir)
 
-    for filename in os.listdir(before_data_dir):
-        datafile = SingleFile(filepath=os.path.join(before_data_dir, filename))
-        data_reader = datafile.get_reader(batch_size=batch_size)
+    for path_dir in [before_data_dir, after_data_dir]:
+        for filename in os.listdir(path_dir):
+            filepath = os.path.join(path_dir, filename)
+            datafile = SingleFile(filepath=filepath)
+            data_reader = datafile.get_reader(batch_size=batch_size)
 
-        single_file_path = os.path.join(figures_dir, f'{datafile.filename}')
+            if path_dir is before_data_dir:
+                single_file_path = os.path.join(figures_dir, 'before',f'{datafile.filename}')
+            else:
+                single_file_path = os.path.join(figures_dir, 'after', f'{datafile.filename}')
 
-        if not os.path.exists(single_file_path):
-            os.mkdir(single_file_path)
+            if not os.path.exists(single_file_path):
+                os.makedirs(single_file_path)
 
-        for batch_id, points in enumerate(data_reader()):
-            for point_id, point in enumerate(points):
-                point_id = batch_id * batch_size + point_id
-                print(f'[INFO] drawing {filename}--point_{point_id}...')
-                plt.figure()
-                point.plot(show=False)
-                plt.savefig(
-                    os.path.join(single_file_path, f'point_{point_id}.jpg')
-                )
-                plt.close()
+            for batch_id, points in enumerate(data_reader()):
+                for point_id, point in enumerate(points):
+                    point_id = batch_id * batch_size + point_id
+                    print(f'[INFO] drawing {filename}--point_{point_id}...')
+                    plt.figure()
+                    point.plot(show=False)
+                    plt.savefig(
+                        os.path.join(single_file_path, f'point_{point_id}.jpg')
+                    )
+                    plt.close()
+
 
 if __name__ == '__main__':
     generateAllPictures()
