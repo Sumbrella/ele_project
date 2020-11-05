@@ -14,7 +14,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
                  filter_size=(1, 3),
                  stride=1,
                  groups=1,
-                 padding=0,
+                 padding=(0, 1),
                  act="leaky",
                  is_test=True):
         super(ConvBNLayer, self).__init__()
@@ -61,7 +61,7 @@ class DownSample(fluid.dygraph.Layer):
                  ch_out,
                  filter_size=(1, 3),
                  stride=2,
-                 padding=1,
+                 padding=(0, 1),
                  is_test=True):
 
         super(DownSample, self).__init__()
@@ -186,6 +186,7 @@ class DarkNet53_conv_body(fluid.dygraph.Layer):
         out = self.conv0(inputs)
         # print("conv1:",out.numpy())
         out = self.downsample0(out)
+        print(out)
         # print("dy:",out.numpy())
         blocks = []
         for i, conv_block_i in enumerate(self.darknet53_conv_block_list):  # 依次将各个层级作用在输入上面
@@ -195,6 +196,80 @@ class DarkNet53_conv_body(fluid.dygraph.Layer):
                 out = self.downsample_list[i](out)
 
         return blocks[-1:-4:-1]  # 将C0, C1, C2作为返回值
+
+
+elt_network_ctg = [2, 8, 4]
+
+
+class EleNetwork(fluid.dygraph.Layer):
+    def __init__(self, stages=None, is_test=True):
+        super(EleNetwork, self).__init__()
+        if stages is None:
+            stages = elt_network_ctg
+
+        self.stages = stages
+        self.darknet53_conv_block_list = []
+        self.downsample_list = []
+
+        self.conv0 = ConvBNLayer(
+            ch_in=2,
+            ch_out=32,
+            filter_size=(1, 3),
+            stride=1,
+            padding=(0, 1),
+            is_test=is_test
+        )
+
+        self.downsample0 = DownSample(
+            ch_in=32,
+            ch_out=32*2,
+            is_test=is_test
+        )
+
+        for i, stage in enumerate(self.stages):
+            conv_block = self.add_sublayer(
+                "stage_%d" % (i),
+                LayerWarp(32 * (2 ** (i + 1)),
+                          32 * (2 ** i),
+                          stage,
+                          is_test=is_test))
+            self.darknet53_conv_block_list.append(conv_block)
+
+        # 两个层级之间使用DownSample将尺寸减半
+        for i in range(len(self.stages) - 1):
+            downsample = self.add_sublayer(
+                "stage_%d_downsample" % i,
+                DownSample(ch_in=32 * (2 ** (i + 1)),
+                           ch_out=32 * (2 ** (i + 2)),
+                           is_test=is_test))
+            self.downsample_list.append(downsample)
+
+        output_size = [1, 256, 1, 13]
+
+        self.fc1 = fluid.dygraph.Linear(input_dim=256*13, output_dim=100, param_attr=ParamAttr(fluid.initializer.Normal(0.3)), act='relu')
+        self.fc2 = fluid.dygraph.Linear(input_dim=100, param_attr=ParamAttr(fluid.initializer.Normal(0.3)), output_dim=5, act='relu')
+
+    def forward(self, inputs):
+        out = self.conv0(inputs)
+        # print("conv1:",out.numpy())
+        out = self.downsample0(out)
+
+        # print("dy:",out.numpy())
+        blocks = []
+        for i, conv_block_i in enumerate(self.darknet53_conv_block_list):  # 依次将各个层级作用在输入上面
+            out = conv_block_i(out)
+            blocks.append(out)
+            if i < len(self.stages) - 1:
+                out = self.downsample_list[i](out)
+
+        out = fluid.layers.reshape(x=out, shape=[1, 256*13])
+        out = self.fc1(out)
+        out = self.fc2(out)
+        print(out)
+        return out
+
+def get_loss():
+    pass
 
 
 
@@ -209,14 +284,20 @@ if __name__ == '__main__':
     after_data_path = SingleFile(after_data_path)
 
     with fluid.dygraph.guard():
-        backbone = DarkNet53_conv_body(is_test=False)
-        # x = np.random.randn(1, 2, 1, 640).astype('float32')
-        point = before_file.get_one_point()
-        x = point.get_narray().reshape(1, 2, 1, 100)
-        x = x.astype('float32')
+        # backbone = DarkNet53_conv_body(is_test=False)
+        # # x = np.random.randn(1, 2, 1, 640).astype('float32')
+        # point = before_file.get_one_point()
+        # x = point.get_narray().reshape(1, 2, 1, 100)
+        # x = x.astype('float32')
+        # x = to_variable(x)
+        # C0, C1, C2 = backbone(x)
+        # print(C0.shape, C1.shape, C2.shape)
+
+        nt = EleNetwork()
+        x = np.random.randn(1, 2, 1, 100).astype('float32')
         x = to_variable(x)
-        C0, C1, C2 = backbone(x)
-        print(C0.shape, C1.shape, C2.shape)
+        print(nt(x))
+
 
 
 
