@@ -43,6 +43,7 @@ class SingleFile:
         return self._remind_point_number
 
     def _init_title(self, fp):
+
         self._point_number = eval(fp.readline())
         self._remind_point_number = self._point_number
         self._date = fp.readline()
@@ -53,7 +54,7 @@ class SingleFile:
                 try:
                     yield SinglePoint(fp=self._fp, skip_line=2)
                 except Exception as e:
-                    print(e)
+                    # print(e)
                     # raise
                     break
             yield None
@@ -96,7 +97,7 @@ class SingleFile:
 
     def __describe(self):
         # TODO：ADD FILE BASIC DESCRIPTION
-        print(
+         (
             f"""
 ============================{self.filename}============================
 point_number: {self._point_number}
