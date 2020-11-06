@@ -54,6 +54,9 @@ class SinglePoint:
         if show:
             plt.show()
 
+    def get_data(self):
+        return [self.x, self.y]
+
     def get_narray(self, dtype):
         import numpy as np
         return np.array([self.x, self.y], dtype=dtype)
