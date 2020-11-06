@@ -8,7 +8,7 @@ before_filepath = "../../data/origin/before/LINE_100_dbdt.dat"
 after_filepath = "../../data/origin/after/new_LINE_100_dbdt.dat"
 
 
-def target_func(input, a, b, c, d, e, f, g, h, i):
+def exponenial_func(input, a, b, c, d, e, f, g, h, i):
     ep = 1e-7
     input = abs(input)
     return a * np.log(abs(b * input + ep)) + c * np.log(abs(d * input + ep)) ** 2 + e * np.log(abs(f * input + ep)) ** 3 + g * np.log(abs(h * input + ep)) ** 4 + i
@@ -24,10 +24,10 @@ def fit_point(point:SinglePoint, show=False):
 
     plt.plot(x_data, y_data, 'b--')
 
-    popt, pcov = curve_fit(target_func, x_data, y_data)
+    popt, pcov = curve_fit(exponenial_func, x_data, y_data, p0=[1 for _ in range(9)], maxfev=1000000)
     # print(popt)
 
-    y2 = [target_func(i, popt[0], popt[1], popt[2], popt[3], popt[4], popt[5], popt[6], popt[7], popt[8]) for i in x_data]
+    y2 = [exponenial_func(i, *popt) for i in x_data]
 
     plt.plot(x_data, y2, 'r-')
 

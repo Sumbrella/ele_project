@@ -8,7 +8,7 @@ class SingleFile:
     def __init__(self, filepath, pre_read_number=None):
 
         if not os.path.exists(filepath):
-            raise ValueError('Don\'t find the file')
+            raise ValueError('Don\'t find the file {}'.format(filepath))
 
         if pre_read_number is None:
             pre_read_number = 0
@@ -82,7 +82,6 @@ class SingleFile:
                 if len(points) is batch_size:
                     yield points
                     points = []
-
 
             if len(points):
                 yield points
