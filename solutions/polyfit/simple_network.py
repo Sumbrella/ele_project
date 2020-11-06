@@ -10,6 +10,7 @@ from solutions.polyfit.main import DownSample
 from solutions.polyfit.get_reader import get_reader
 from common.unit import Reader
 
+
 class ConvBNLayer(fluid.dygraph.Layer):
     """
     卷积 + 批归一化，BN层之后激活函数默认用leaky_relu
