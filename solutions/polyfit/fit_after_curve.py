@@ -9,7 +9,7 @@ train_dir = "../../data/train"
 test_dir = "../../data/test"
 
 
-def fit_file(file_path, save_path, show=False):
+def fit_file(file_path, save_path, show=False, weight=1):
     print('[INFO] FITTING FILE:{}'.format(file_path))
     file = SingleFile(file_path)
     path, file_name = os.path.split(file_path)
@@ -28,7 +28,7 @@ def fit_file(file_path, save_path, show=False):
             print('\t[INFO] FITTING POINT {}'.format(point_id))
             params = fit_point(point, show=show)
             print('\t[INFO] FITTED POINT {} RESULT:\n\t{}'.format(point_id, params))
-            all_params.append(params)
+            all_params.append(params * weight)
 
     df = pd.DataFrame(all_params, columns=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'])
     df.to_csv(save_file)
