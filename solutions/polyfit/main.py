@@ -1,5 +1,5 @@
 from paddle import fluid
-from paddle.fluid.dygraph.nn import Conv2D, ParamAttr
+from paddle.fluid.dygraph.nn import Conv2D, ParamAttr, MSELoss
 from paddle.fluid.dygraph import BatchNorm, to_variable
 from paddle.fluid.regularizer import L2Decay
 
@@ -29,7 +29,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
             padding=padding,
             groups=groups,
             param_attr=ParamAttr(
-                initializer=fluid.initializer.Normal(0., 0.02)),
+                initializer=fluid.initializer.Normal(100, 2)),
             bias_attr=False,
             act=None)
 
@@ -37,10 +37,10 @@ class ConvBNLayer(fluid.dygraph.Layer):
             num_channels=ch_out,
             is_test=is_test,
             param_attr=ParamAttr(
-                initializer=fluid.initializer.Normal(0., 0.02),
+                initializer=fluid.initializer.Normal(100, 2),
                 regularizer=L2Decay(0.)),
             bias_attr=ParamAttr(
-                initializer=fluid.initializer.Constant(0.0),
+                initializer=fluid.initializer.Constant(100),
                 regularizer=L2Decay(0.)))
 
         self.act = act
@@ -248,11 +248,11 @@ class EleNetwork(fluid.dygraph.Layer):
 
         output_size = [1, 256, 1, 13]
 
-        self.fc1 = fluid.dygraph.Linear(input_dim=256*13, output_dim=100, act='relu')
-        self.fc2 = fluid.dygraph.Linear(input_dim=100, output_dim=5, act='relu')
+        self.fc1 = fluid.dygraph.Linear(input_dim=256*13, output_dim=9, act='relu')
 
     def forward(self, inputs):
         out = self.conv0(inputs)
+        print('conv0_out', out)
         # print("conv1:",out.numpy())
         out = self.downsample0(out)
 
@@ -263,36 +263,99 @@ class EleNetwork(fluid.dygraph.Layer):
             blocks.append(out)
             if i < len(self.stages) - 1:
                 out = self.downsample_list[i](out)
-
-        out = fluid.layers.reshape(x=out, shape=[1, 256*13])
+        # print(out)
+        out = fluid.layers.reshape(x=out, shape=[-1, 256*13])
         out = self.fc1(out)
-        out = self.fc2(out)
-        print(out)
+        # out = self.fc2(out)
+        print('out:', out)
         return out
-
-def get_loss():
-    pass
-
 
 
 if __name__ == '__main__':
     import numpy as np
     from common.unit import SingleFile
 
-    train_dir = "../../data/train"
+    train_dir = "../../data/train/before"
     train_label_dir = "../../data/train/teacher"
-    test_dir = "../../data/test"
+    test_dir = "../../data/test/before"
     test_label_dir = "../../data/test/teacher"
 
-    train_reader = get_reader(train_dir, train_label_dir)
-    test_reader = get_reader(test_dir, test_label_dir)
+    train_reader = get_reader(train_dir, train_label_dir, batch_size=15)
+    test_reader = get_reader(test_dir, test_label_dir, batch_size=15)
+
+    # =====
+    # tmp_data = np.random.randn(1, 2, 1, 100).astype('float64')
+    # tmp_data = tmp_data / 10000000
+    # with fluid.dygraph.guard():
+    #     tmp_data = to_variable(tmp_data)
+    #     net = EleNetwork()
+    #     net(tmp_data)
+    # =====
+    
+    lr = 0.1
+    epoch_num = 10
+    loss_function = MSELoss()
+
+    train_losses = []
+    # mode = 'debug'
+    mode = 'train'
+
 
     with fluid.dygraph.guard():
         model = EleNetwork()
-        trainer = Trainer(name="ele", loss_function=fluid.layers.cross_entropy)
+        # trainer = Trainer(name="ele", loss_function=fluid.layers.square_error_cost)
         reader = Reader(train=train_reader, test=test_reader)
-        trainer.train(model=model, reader=reader, epoch_num=5)
 
 
+        model.train()
+        optimizer = fluid.optimizer.Adam(learning_rate=lr, parameter_list=model.parameters())
 
+        for epoch in range(epoch_num):
+            for batch, data in enumerate(reader.train()):
+                imgs, labels = data
+                imgs = fluid.dygraph.to_variable(imgs)
+                labels = fluid.dygraph.to_variable(labels)
+                logits = model(imgs)
+                # print(logits)
+                loss = fluid.layers.square_error_cost(logits, labels)
+                avg_loss = fluid.layers.mean(loss)
+                print(avg_loss.numpy())
+                # train_losses.append(avg_loss)
+
+                if mode == 'debug':
+
+                    print("label:", labels.numpy())
+                    print("logits:", logits.numpy())
+                    print("loss:", loss.numpy())
+                    print("avg_loss:", avg_loss.numpy())
+
+
+                avg_loss.backward()
+
+                optimizer.minimize(avg_loss)
+
+                model.clear_gradients()
+
+                if batch % 10 == 0:
+                    train_losses.append(avg_loss.numpy())
+                    print(f"epoch:{epoch} batch:{batch} loss:{avg_loss.numpy()}")
+
+            model.eval()
+            losses = []
+            # accuracies = []
+            for batch, data in enumerate(reader.test()):
+                imgs, labels = data
+                # print(labels)
+                imgs = fluid.dygraph.to_variable(imgs)
+                labels = fluid.dygraph.to_variable(labels)
+                logits = model(imgs)
+                print(logits)
+                loss = fluid.layers.square_error_cost(logits, labels)
+                avg_loss = fluid.layers.mean(loss)
+                # accuracy = fluid.layers.accuracy(logits, labels)
+                # accuracies.append(accuracy.numpy())
+
+
+            print(f"epoch:{epoch} test_result: loss | {np.mean(avg_loss.numpy())}")
+            model.train()
 
