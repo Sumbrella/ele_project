@@ -123,7 +123,7 @@ def train():
                 labels = to_variable(labels)
 
                 logits = model(points)
-                print(logits)
+
                 loss = loss_function(logits, labels)
                 avg_loss = fluid.layers.mean(loss)
 
