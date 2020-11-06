@@ -3,6 +3,8 @@ from paddle.fluid.dygraph.nn import Conv2D, ParamAttr
 from paddle.fluid.dygraph import BatchNorm, to_variable
 from paddle.fluid.regularizer import L2Decay
 
+from solutions.polyfit.get_reader import get_reader
+from common.unit import Trainer, Reader
 
 class ConvBNLayer(fluid.dygraph.Layer):
     """
@@ -246,8 +248,8 @@ class EleNetwork(fluid.dygraph.Layer):
 
         output_size = [1, 256, 1, 13]
 
-        self.fc1 = fluid.dygraph.Linear(input_dim=256*13, output_dim=100, param_attr=ParamAttr(fluid.initializer.Normal(0.3)), act='relu')
-        self.fc2 = fluid.dygraph.Linear(input_dim=100, param_attr=ParamAttr(fluid.initializer.Normal(0.3)), output_dim=5, act='relu')
+        self.fc1 = fluid.dygraph.Linear(input_dim=256*13, output_dim=100, act='relu')
+        self.fc2 = fluid.dygraph.Linear(input_dim=100, output_dim=5, act='relu')
 
     def forward(self, inputs):
         out = self.conv0(inputs)
@@ -277,28 +279,19 @@ if __name__ == '__main__':
     import numpy as np
     from common.unit import SingleFile
 
-    before_data_path = "../../data/origin/before/LINE_100_dbdt.dat"
-    after_data_path = "../../data/origin/after/new_LINE_100_dbdt.dat"
+    train_dir = "../../data/train"
+    train_label_dir = "../../data/train/teacher"
+    test_dir = "../../data/test"
+    test_label_dir = "../../data/test/teacher"
 
-    before_file = SingleFile(before_data_path)
-    after_data_path = SingleFile(after_data_path)
+    train_reader = get_reader(train_dir, train_label_dir)
+    test_reader = get_reader(test_dir, test_label_dir)
 
     with fluid.dygraph.guard():
-        # backbone = DarkNet53_conv_body(is_test=False)
-        # # x = np.random.randn(1, 2, 1, 640).astype('float32')
-        # point = before_file.get_one_point()
-        # x = point.get_narray().reshape(1, 2, 1, 100)
-        # x = x.astype('float32')
-        # x = to_variable(x)
-        # C0, C1, C2 = backbone(x)
-        # print(C0.shape, C1.shape, C2.shape)
-
-        nt = EleNetwork()
-        x = np.random.randn(1, 2, 1, 100).astype('float32')
-        x = to_variable(x)
-        print(nt(x))
-
-
+        model = EleNetwork()
+        trainer = Trainer(name="ele", loss_function=fluid.layers.cross_entropy)
+        reader = Reader(train=train_reader, test=test_reader)
+        trainer.train(model=model, reader=reader, epoch_num=5)
 
 
 

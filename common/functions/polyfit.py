@@ -22,16 +22,14 @@ def fit_point(point:SinglePoint, show=False):
     y_data = scaler.fit_transform(np.array(y_data).reshape(-1, 1) * 10) + 0.2
     y_data = y_data.flatten()
 
-    plt.plot(x_data, y_data, 'b--')
-
     popt, pcov = curve_fit(exponenial_func, x_data, y_data, p0=[1 for _ in range(9)], maxfev=1000000)
     # print(popt)
-
     y2 = [exponenial_func(i, *popt) for i in x_data]
 
-    plt.plot(x_data, y2, 'r-')
-
     if show:
+        plt.plot(x_data, y_data, 'b--', label='origin')
+        plt.plot(x_data, y2, 'r-', label='fit')
+        plt.legend()
         plt.show()
 
     return popt
