@@ -246,9 +246,10 @@ class EleNetwork(fluid.dygraph.Layer):
                            is_test=is_test))
             self.downsample_list.append(downsample)
 
-        output_size = [1, 256, 1, 13]
-
         self.fc1 = fluid.dygraph.Linear(input_dim=256*13, output_dim=9, act='relu')
+
+        self.fc2 = fluid.dygraph.Linear(input_dim=9, output_dim=1, act='relu'
+                                        )
 
     def forward(self, inputs):
         out = self.conv0(inputs)
@@ -266,8 +267,9 @@ class EleNetwork(fluid.dygraph.Layer):
         # print(out)
         out = fluid.layers.reshape(x=out, shape=[-1, 256*13])
         out = self.fc1(out)
+        out = self.fc2(out)
         # out = self.fc2(out)
-        print('out:', out)
+        # print('out:', out)
         return out
 
 

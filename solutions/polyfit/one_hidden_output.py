@@ -15,14 +15,13 @@ class OneHiddenNetwork(Layer):
 
         # self.bn1 = BatchNorm(num_channels=2, act='relu')
 
-        self.fc1 = Linear(input_dim=200, output_dim=50, act='relu')
-        self.fc2 = Linear(input_dim=50, output_dim=9, act='relu')
+        self.fc1 = Linear(input_dim=28*28, output_dim=50, act='relu')
+        self.fc2 = Linear(input_dim=50, output_dim=10, act='relu')
 
     def forward(self, input):
 
         # out = self.bn1(input)
-        out = fluid.layers.flatten(x=input, axis=1)
-
+        out = fluid.layers.reshape(input, shape=[input.shape[0], -1])
         out = self.fc1(out)
         out = self.fc2(out)
 
@@ -30,12 +29,12 @@ class OneHiddenNetwork(Layer):
 
 
 def test_sample():
-    tmp_data = np.random.randn(1, 2, 1, 100).astype('float32')
+    tmp_data = np.random.randn(10, 28, 28).astype('float32')
 
     with fluid.dygraph.guard():
         tmp_data = fluid.dygraph.to_variable(tmp_data)
         net = OneHiddenNetwork()
-        net(tmp_data)
+        print(net(tmp_data))
 
 
 def train():
@@ -49,7 +48,8 @@ def train():
     train_reader = get_reader(train_dir, train_label_dir)
     test_reader = get_reader(test_dir, test_label_dir)
 
-    reader = Reader(train_reader, test_reader)
+    # reader = Reader(train_reader, test_reader)
+    reader = Reader.from_paddle('mnist')
     loss_function = MSELoss(reduction='sum')
 
     with fluid.dygraph.guard():
@@ -68,7 +68,8 @@ def train():
 
                 logits = model(points)
 
-                loss = loss_function(logits, labels)
+                # loss = loss_function(logits, labels)
+                loss = fluid.layers.cross_entropy(logits, labels)
                 avg_loss = fluid.layers.mean(loss)
 
                 avg_loss.backward()
@@ -82,5 +83,12 @@ def train():
 
 
 if __name__ == '__main__':
-    # test_sample()
+    test_sample()
     train()
+    # from common.unit import Reader, Trainer
+    #
+    # reader = Reader.from_paddle(data_name='mnist')
+    # trainer = Trainer(name="mnist")
+    #
+    # model = OneHiddenNetwork()
+    # trainer.train(model, reader)
