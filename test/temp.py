@@ -1,9 +1,10 @@
-from paddle import fluid
-import numpy as np
+import pandas as pd
+from solutions.polyfit.get_reader import get_reader
 
-with fluid.dygraph.guard():
-    conv1 = fluid.dygraph.Conv2D(num_channels=1, num_filters=5, filter_size=3, stride=1, padding=(0,1))
-    x = np.random.randn(1, 1, 3, 3).astype('float32')
-    x = fluid.dygraph.to_variable(x)
-    res = conv1(x)
-    print(res)
+reader = get_reader(data_dir='../data/train/before', csv_dir='../data/train/teacher', batch_size=1)
+
+for i, data in enumerate(reader()):
+    data, label = data
+    print(data.shape)
+    print(label)
+    break
