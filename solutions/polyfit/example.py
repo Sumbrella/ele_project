@@ -1,12 +1,18 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+
 from paddle import fluid
-from paddle.fluid import Pool2D, Conv2D, Linear
+from paddle.fluid import Pool2D, Conv2D, Linear, BatchNorm
 
 from solutions.polyfit.get_reader import get_reader
+from solutions.polyfit.teacher_change import change_teacher
 
 
 class AlexNet(fluid.dygraph.Layer):
     def __init__(self, num_classes=9):
         super(AlexNet, self).__init__()
+
+        self.bn1 = BatchNorm(num_channels=2, act='relu')
 
         self.conv1 = Conv2D(num_channels=2, num_filters=96, filter_size=11, stride=4, padding=5, act='relu')
         self.pool1 = Pool2D(pool_size=2, pool_stride=2, pool_type='max')
@@ -26,6 +32,7 @@ class AlexNet(fluid.dygraph.Layer):
         self.conv_layers = [self.conv1, self.pool1, self.conv2, self.pool2, self.conv3, self.conv4, self.conv5, self.pool5]
 
     def forward(self, x):
+
         for layers in self.conv_layers:
             x = layers(x)
         # print(x.shape)
@@ -64,7 +71,7 @@ if __name__ == '__main__':
     # =====
 
     lr = 0.1
-    epoch_num = 10
+    epoch_num = 100
     loss_function = fluid.layers.cross_entropy
 
     train_losses = []
@@ -82,6 +89,10 @@ if __name__ == '__main__':
         for epoch in range(epoch_num):
             for batch, data in enumerate(reader.train()):
                 imgs, labels = data
+
+                # change teacher label value
+                labels = change_teacher(labels)
+
                 imgs = fluid.dygraph.to_variable(imgs)
                 labels = fluid.dygraph.to_variable(labels)
                 logits = model(imgs)
@@ -111,17 +122,24 @@ if __name__ == '__main__':
             # accuracies = []
             for batch, data in enumerate(reader.test()):
                 imgs, labels = data
-                # print(labels)
+
+                # change labels
+                labels = change_teacher(labels)
+
                 imgs = fluid.dygraph.to_variable(imgs)
                 labels = fluid.dygraph.to_variable(labels)
                 logits = model(imgs)
-                print("label\n", labels)
-                print("logits\n", logits)
+                # print("label\n", labels)
+                # print("logits\n", logits)
                 loss = fluid.layers.square_error_cost(logits, labels)
                 avg_loss = fluid.layers.mean(loss)
                 # accuracy = fluid.layers.accuracy(logits, labels)
                 # accuracies.append(accuracy.numpy())
 
             print(f"epoch:{epoch} test_result: loss | {np.mean(avg_loss.numpy())}")
+
             model.train()
 
+    train_losses = pd.DataFrame(train_losses)
+    train_losses.plot()
+    plt.show()
