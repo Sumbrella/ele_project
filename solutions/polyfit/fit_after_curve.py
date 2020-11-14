@@ -26,7 +26,7 @@ def fit_file(file_path, save_path, show=False, weight=1):
     for point_id, points in enumerate(reader()):
         for point in points:
             print('\t[INFO] FITTING POINT {}'.format(point_id))
-            params = fit_point(point, show=show)
+            params = fit_point(point, show=show, maxfev=2000)
             print('\t[INFO] FITTED POINT {} RESULT:\n\t{}'.format(point_id, params))
             all_params.append(params * weight)
 
@@ -43,7 +43,6 @@ def fit_dir(dir_path, save_path, show=False):
         except Exception as e:
             print(e)
             continue
-
 
 
 if __name__ == '__main__':

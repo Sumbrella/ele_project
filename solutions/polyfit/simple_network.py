@@ -1,4 +1,3 @@
-
 import numpy as np
 from paddle import fluid
 from paddle.fluid.dygraph import Conv2D, Layer, NaturalExpDecay, BatchNorm, Linear, MSELoss
@@ -15,6 +14,7 @@ class ConvBNLayer(fluid.dygraph.Layer):
     """
     卷积 + 批归一化，BN层之后激活函数默认用leaky_relu
     """
+
     def __init__(self,
                  ch_in,
                  ch_out,
@@ -57,17 +57,17 @@ class ConvBNLayer(fluid.dygraph.Layer):
             out = fluid.layers.leaky_relu(x=out, alpha=0.1)
         return out
 
+
 class SimpleNetwork(Layer):
     def __init__(self):
         super(SimpleNetwork, self).__init__()
 
         self.conv1 = ConvBNLayer(ch_in=2, ch_out=10, filter_size=(1, 3), stride=1, is_test=False)
-        self.downsample1 = DownSample(ch_in=10, ch_out=10*2, is_test=False)
+        self.downsample1 = DownSample(ch_in=10, ch_out=10 * 2, is_test=False)
         self.conv2 = ConvBNLayer(ch_in=20, ch_out=1, is_test=False)
         self.downsample2 = DownSample(ch_in=1, ch_out=2, is_test=False)
 
-        self.fc1 = Linear(input_dim=2*25, output_dim=9, act='relu')
-
+        self.fc1 = Linear(input_dim=2 * 25, output_dim=9, act='relu')
 
     def forward(self, input):
         out = self.conv1(input)
@@ -137,6 +137,11 @@ def train():
                     print(f'[INFO] batch: {batch}, loss: {avg_loss.numpy()}')
 
             # TODO: test for each epoch
+
+
+class hidden_network(fluid.dygraph.Layer):
+    def __int__(self):
+        super(hidden_network, self).__init__()
 
 
 if __name__ == '__main__':

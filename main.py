@@ -1,3 +1,6 @@
+from solutions.polyfit.example import AlexNet
+
+
 def main():
     pass
 
