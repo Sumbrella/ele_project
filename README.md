@@ -113,6 +113,10 @@ from paddle import fluid
 from paddle.fluid import ParamAttr, Pool2D, Conv2D, Linear, BatchNorm
 from paddle.fluid.regularizer import L2Decay
 
+from solutions.polyfit.get_reader import get_reader
+from solutions.polyfit.teacher_change import change_teacher
+
+
 class ConvBNLayer(fluid.dygraph.Layer):
     """
     卷积 + 批归一化，BN层之后激活函数默认用leaky_relu
