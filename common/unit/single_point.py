@@ -45,12 +45,12 @@ class SinglePoint:
     def data(self):
         return self._data
 
-    def plot(self, show=True):
+    def plot(self, show=True, label='origin'):
         import matplotlib.pyplot as plt
         df = pd.DataFrame(self._data)
         x = df.iloc[:, 0]
         y = df.iloc[:, 1]
-        plt.plot(x, y)
+        plt.plot(x, y, label=label)
         if show:
             plt.show()
 
