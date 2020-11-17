@@ -8,3 +8,4 @@ before_file = SingleFile(before_filepath)
 after_file = SingleFile(after_filepath)
 
 fit_point(before_file.get_one_point(), show=True)
+fit_point(after_file.get_one_point(), show=True)
