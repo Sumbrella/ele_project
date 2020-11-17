@@ -11,12 +11,12 @@ from common.functions.polyfit import exponenial_func
 
 
 def main():
-    data_path = "../../data/origin/before/LINE_100_dbdt.dat"
+    data_path = "../../data/train/before/LINE_100_dbdt.dat"
 
     with fluid.dygraph.guard():
         model = AlexNet()
         # Load static
-        min_dict, _= fluid.load_dygraph(model_path='min_polyfit')
+        min_dict, _ = fluid.load_dygraph(model_path='min_polyfit')
         # print(min_dict)
         model.set_dict(stat_dict=min_dict)
 
@@ -38,12 +38,11 @@ def main():
         result = back_change(result)
 
     x_data = one_point.x
-    print(result)
-    one_point.plot(show=False)
-    plt.plot(x_data, [exponenial_func(x, *result[0]) for x in x_data])
+    print("RESULT: \n", result)
+    one_point.plot(show=False, label='origin')
+    plt.plot(x_data, [exponenial_func(x, *result[0]) for x in x_data], label='predict')
     plt.show()
 
 
 if __name__ == '__main__':
     main()
-
