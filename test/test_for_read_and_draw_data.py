@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from common.unit import SingleFile
+from common.units import SingleFile
 
 before_filepath = '../data/origin/before/LINE_100_dbdt.dat'
 after_filepath = '../data/origin/after/new_LINE_100_dbdt.dat'

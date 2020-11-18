@@ -4,7 +4,8 @@ from paddle.fluid.dygraph import BatchNorm, to_variable
 from paddle.fluid.regularizer import L2Decay
 
 from solutions.polyfit.get_reader import get_reader
-from common.unit import Trainer, Reader
+from common.units import Trainer, Reader
+
 
 class ConvBNLayer(fluid.dygraph.Layer):
     """
@@ -275,7 +276,7 @@ class EleNetwork(fluid.dygraph.Layer):
 
 if __name__ == '__main__':
     import numpy as np
-    from common.unit import SingleFile
+    from common.units import SingleFile
 
     train_dir = "../../data/train/before"
     train_label_dir = "../../data/train/teacher"

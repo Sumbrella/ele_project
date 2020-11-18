@@ -1,5 +1,5 @@
 __all__ = [
-    'co_empy_gatem',
+    'loop_tem1d',
     'polyfit'
 ]
 

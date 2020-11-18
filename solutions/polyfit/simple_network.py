@@ -7,7 +7,7 @@ from paddle.fluid.regularizer import L2Decay
 
 from solutions.polyfit.main import DownSample
 from solutions.polyfit.get_reader import get_reader
-from common.unit import Reader
+from common.units import Reader
 
 
 class ConvBNLayer(fluid.dygraph.Layer):

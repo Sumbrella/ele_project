@@ -74,10 +74,10 @@ if __name__ == '__main__':
     times = gatem_results[:, 0]
     L_square = 1
     # === ORIGIN ===
-    # depth = [100, ]
-    # res = [1e2, 1e2, ]
-    depth = [100, 1000, 1100]
-    res = [0, 30, 0, 0]
+    depth = [100, ]
+    res = [1e2, 1e2, ]
+    # depth = [100, 1000, 1100]
+    # res = [500, 30, 400, 0]
 
     EM_b, EM_db = loop_tem1d(times, L_square, depth, res, verb_flag=0)
 
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     plt.title('Model Result')
 
     # empymod
-    # plt.plot(times, np.abs(gatem_results[:, 1]), 'b', label="GATEM_Fwd1D")
+    plt.plot(times, np.abs(gatem_results[:, 1]), 'b', label="GATEM_Fwd1D")
     plt.plot(times, np.abs(EM_db), 'r--', label="empymod")
 
     # Plot settings
@@ -107,17 +107,17 @@ if __name__ == '__main__':
 
     # Plot settings
     plt.xscale('log')
-    # plt.yscale('log')
+    plt.yscale('log')
     plt.xlabel("Time(s)")
     plt.ylabel(r"Relative Error (%)")
-    plt.ylim(0, 5)
+    # plt.ylim(0, 5)
     plt.legend(title='Difference', loc=3)
 
     # Force minor ticks on logscale
-    ax1.yaxis.set_minor_locator(LogLocator(subs='all', numticks=20))
-    ax2.yaxis.set_minor_locator(LogLocator(subs='all', numticks=20))
-    ax1.yaxis.set_minor_formatter(NullFormatter())
-    ax2.yaxis.set_minor_formatter(NullFormatter())
+    # ax1.yaxis.set_minor_locator(LogLocator(subs='all', numticks=20))
+    # ax2.yaxis.set_minor_locator(LogLocator(subs='all', numticks=20))
+    # ax1.yaxis.set_minor_formatter(NullFormatter())
+    # ax2.yaxis.set_minor_formatter(NullFormatter())
 
     plt.grid(which='both', c='w')
 

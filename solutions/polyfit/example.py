@@ -2,25 +2,71 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from paddle import fluid
-from paddle.fluid import Pool2D, Conv2D, Linear, BatchNorm
+from paddle.fluid import ParamAttr, Pool2D, Conv2D, Linear, BatchNorm
+from paddle.fluid.regularizer import L2Decay
 
 from solutions.polyfit.get_reader import get_reader
 from solutions.polyfit.teacher_change import change_teacher
+
+
+class ConvBNLayer(fluid.dygraph.Layer):
+    """
+    卷积 + 批归一化，BN层之后激活函数默认用leaky_relu
+    """
+    def __init__(self,
+                 num_channels,
+                 num_filters,
+                 filter_size=(1, 3),
+                 stride=1,
+                 groups=1,
+                 padding=(0, 1),
+                 act="leaky",
+                 is_test=True):
+        super(ConvBNLayer, self).__init__()
+
+        self.conv = Conv2D(
+            num_channels=num_channels,
+            num_filters=num_filters,
+            filter_size=filter_size,
+            stride=stride,
+            padding=padding,
+            groups=groups,
+            param_attr=ParamAttr(
+                initializer=fluid.initializer.Normal(0, 0.2)),
+            bias_attr=False,
+            act=None)
+
+        self.batch_norm = BatchNorm(
+            num_channels=num_filters,
+            is_test=is_test,
+            param_attr=ParamAttr(
+                initializer=fluid.initializer.Normal(0, 0.2),
+                regularizer=L2Decay(0.)),
+            bias_attr=ParamAttr(
+                initializer=fluid.initializer.Constant(100),
+                regularizer=L2Decay(0.)))
+
+        self.act = act
+
+    def forward(self, inputs):
+        out = self.conv(inputs)
+        out = self.batch_norm(out)
+        if self.act == 'leaky':
+            out = fluid.layers.leaky_relu(x=out, alpha=0.1)
+        return out
 
 
 class AlexNet(fluid.dygraph.Layer):
     def __init__(self, num_classes=9):
         super(AlexNet, self).__init__()
 
-        self.bn1 = BatchNorm(num_channels=2, act='relu')
-
-        self.conv1 = Conv2D(num_channels=2, num_filters=96, filter_size=11, stride=4, padding=5, act='relu')
+        self.conv1 = ConvBNLayer(num_channels=2, num_filters=96, filter_size=11, stride=4, padding=5, act='leaky_relu')
         self.pool1 = Pool2D(pool_size=2, pool_stride=2, pool_type='max')
-        self.conv2 = Conv2D(num_channels=96, num_filters=256, filter_size=5, stride=1, padding=2, act='relu')
+        self.conv2 = ConvBNLayer(num_channels=96, num_filters=256, filter_size=5, stride=1, padding=2, act='relu')
         self.pool2 = Pool2D(pool_size=2, pool_stride=2, pool_type='max')
-        self.conv3 = Conv2D(num_channels=256, num_filters=384, filter_size=3, stride=1, padding=1, act='relu')
-        self.conv4 = Conv2D(num_channels=384, num_filters=384, filter_size=3, stride=1, padding=1, act='relu')
-        self.conv5 = Conv2D(num_channels=384, num_filters=256, filter_size=3, stride=1, padding=1, act='relu')
+        self.conv3 = ConvBNLayer(num_channels=256, num_filters=384, filter_size=3, stride=1, padding=1, act='leaky_relu')
+        self.conv4 = ConvBNLayer(num_channels=384, num_filters=384, filter_size=3, stride=1, padding=1, act='leaky_relu')
+        self.conv5 = ConvBNLayer(num_channels=384, num_filters=256, filter_size=3, stride=1, padding=1, act='leaky_relu')
         self.pool5 = Pool2D(pool_size=2, pool_stride=2, pool_type='max')
 
         self.fc1 = Linear(input_dim=256 * 3, output_dim=256 * 2, act='relu')
@@ -53,7 +99,7 @@ class AlexNet(fluid.dygraph.Layer):
 
 if __name__ == '__main__':
     import numpy as np
-    from common.unit import SingleFile, Reader
+    from common.units import SingleFile, Reader
 
     train_dir = "../../data/train/before"
     train_label_dir = "../../data/train/teacher"

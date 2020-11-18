@@ -1,4 +1,4 @@
-from common.unit import SingleFile
+from common.units import SingleFile
 from common.functions import fit_point
 
 before_filepath = "../data/origin/before/LINE_100_dbdt.dat"

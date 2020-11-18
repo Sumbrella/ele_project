@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from common.unit import SingleFile, SinglePoint
+from common.units import SingleFile, SinglePoint
 from scipy.optimize import curve_fit
 from sklearn.preprocessing import MinMaxScaler
 
@@ -28,7 +28,7 @@ def fit_point(point:SinglePoint, show=False, maxfev=1000000):
 
     if show:
         plt.plot(x_data, y_data, 'b--', label='origin')
-        plt.plot(x_data, y2, 'r-', label='fit')
+        plt.plot(x_data, y2, 'r--', label='fit')
         plt.legend()
         plt.show()
 
