@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from common.units import SingleFile
+from ele_common.units import SingleFile
 
 
 def get_reader(data_dir, csv_dir, batch_size=10, debug=False, dtype='float32'):

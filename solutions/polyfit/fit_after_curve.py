@@ -2,8 +2,8 @@ import os
 
 import pandas as pd
 
-from common.units import SingleFile
-from common.functions import fit_point
+from ele_common.units import SingleFile
+from ele_common.functions import fit_point
 
 train_dir = "../../data/train"
 test_dir = "../../data/test"

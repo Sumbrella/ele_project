@@ -1,5 +1,5 @@
-from common.units import SingleFile
-from common.functions import fit_point
+from ele_common.units import SingleFile
+from ele_common.functions import fit_point
 
 before_filepath = "../data/origin/before/LINE_100_dbdt.dat"
 after_filepath = "../data/origin/after/new_LINE_100_dbdt.dat"

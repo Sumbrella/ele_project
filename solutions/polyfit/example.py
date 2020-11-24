@@ -99,7 +99,7 @@ class AlexNet(fluid.dygraph.Layer):
 
 if __name__ == '__main__':
     import numpy as np
-    from common.units import SingleFile, Reader
+    from ele_common.units import SingleFile, Reader
 
     train_dir = "../../data/train/before"
     train_label_dir = "../../data/train/teacher"

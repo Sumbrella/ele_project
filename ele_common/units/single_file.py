@@ -1,6 +1,6 @@
 import os.path
 
-from common.units import SinglePoint
+from ele_common.units import SinglePoint
 
 
 class SingleFile:
@@ -108,7 +108,7 @@ point_number: {self._point_number}
 
 
 if __name__ == '__main__':
-    from common.units import SingleFile
+    from ele_common.units import SingleFile
 
     singlefile = SingleFile(filepath='../../data/origin/before/LINE_120_dbdt.dat')
     print(singlefile._date)

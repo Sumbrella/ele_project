@@ -1,7 +1,7 @@
 from paddle import fluid
 
-from common.units.reader import Reader
-from common.units.trainer import Trainer
+from ele_common.units.reader import Reader
+from ele_common.units.trainer import Trainer
 from solutions.polyfit.main import ConvBNLayer, DownSample, LayerWarp
 
 elt_network_ctg = [2, 8, 4]

@@ -4,7 +4,7 @@ from paddle import fluid
 from paddle.fluid.dygraph import Linear, BatchNorm
 from paddle.fluid.dygraph import Layer, MSELoss, NaturalExpDecay, to_variable
 
-from common.units import Reader
+from ele_common.units import Reader
 from solutions.polyfit.get_reader import get_reader
 
 
@@ -84,7 +84,7 @@ def train():
 if __name__ == '__main__':
     test_sample()
     train()
-    # from common.units import Reader, Trainer
+    # from ele_common.units import Reader, Trainer
     #
     # reader = Reader.from_paddle(data_name='mnist')
     # trainer = Trainer(name="mnist")

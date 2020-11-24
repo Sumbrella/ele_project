@@ -1,7 +1,10 @@
+import sys
+sys.path.append('/Users/sumbrella/Documents/GitHub/ele_project')
+
 import numpy as np
 import matplotlib.pyplot as plt
 
-from common.functions import loop_tem1d
+from ele_common.functions import loop_tem1d
 from solutions.lstm_with_cnn.config import *
 
 
@@ -42,9 +45,17 @@ class Generator:
         db_data = np.stack((time, db_data), axis=1)
 
         # 增加扰动
-        self.add_perturbation(db_data)
+        res_data = self.add_perturbation(db_data)
 
-        return db_data
+        return {
+            'origin_data': db_data,
+            'result_data': res_data,
+            'time': time,
+            'depths': depth,
+            'layer_number': layer_number,
+            'res': res,
+            'square': square,
+        }
 
     @staticmethod
     def add_perturbation(db_data, perturbation_scope=None):
@@ -53,16 +64,17 @@ class Generator:
         # 增加扰动
         # B 数据 在其原始数据的 (-15 ~ 80) % 之间抖动
         # 扰动因子 k = 历史扰动数据的平方和开方分之一
-
+        res_data = db_data.copy()
         k = 1
         for index, b_data in enumerate(db_data[:, 1]):
             perturbation_rate = np.random.randint(perturbation_scope[0], perturbation_scope[1]) / 100 / (k ** 0.5)
-            db_data[index][1] = b_data * (1 + perturbation_rate)
+            res_data[index][1] = b_data * (1 + perturbation_rate)
             k = k + perturbation_rate ** 2
+    
+        return res_data
 
     @staticmethod
     def _generate_res(layer_number, scope=None):
-        # TODO
         if scope is None:
             scope = default_res_scope
 

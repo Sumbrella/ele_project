@@ -23,7 +23,7 @@ ELE PROJECT
 数据文件/从文件流中读取一个点，具体的实现见API。  
 __读取一个点的示例__:  
 ```python
-from common.units import SingleFile
+from ele_common.units import SingleFile
 
 singlefile = SingleFile(filepath='../../data/origin/before/LINE_120_dbdt.dat')
 print(singlefile._date)
@@ -38,7 +38,7 @@ import os
 
 import matplotlib.pyplot as plt
 
-from common.units import SingleFile
+from ele_common.units import SingleFile
 
 if __name__ == '__main__':
     father_dir = os.path.dirname(__file__)
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 进行拟合。  
 在圆滑后的数据中，可以得到较好的拟合结果。
 ```python
-from common.units import SingleFile
+from ele_common.units import SingleFile
 from solutions import fit_point
 
 before_filepath = "data/origin/before/LINE_100_dbdt.dat"
@@ -208,7 +208,7 @@ class AlexNet(fluid.dygraph.Layer):
 ### 4. 网络的训练
 ```python
     import numpy as np
-    from common.units import SingleFile, Reader
+    from ele_common.units import SingleFile, Reader
 
     train_dir = "../../data/train/before"
     train_label_dir = "../../data/train/teacher"
@@ -316,8 +316,8 @@ import matplotlib.pyplot as plt
 
 from solutions.polyfit.example import AlexNet
 from solutions.polyfit.teacher_change import back_change
-from common.units import SingleFile
-from common.functions.polyfit import exponenial_func
+from ele_common.units import SingleFile
+from ele_common.functions.polyfit import exponenial_func
 
 
 def main():

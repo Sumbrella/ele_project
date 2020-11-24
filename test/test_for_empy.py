@@ -1,4 +1,4 @@
-from common.functions import loop_tem1d
+from ele_common.functions import loop_tem1d
 
 import numpy as np
 import matplotlib.pyplot as plt

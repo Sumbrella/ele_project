@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from common.functions import loop_tem1d
+from ele_common.functions import loop_tem1d
 
 
 if __name__ == '__main__':

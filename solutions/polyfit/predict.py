@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 from solutions.polyfit.example import AlexNet
 from solutions.polyfit.teacher_change import back_change
-from common.units import SingleFile
-from common.functions.polyfit import exponenial_func
+from ele_common.units import SingleFile
+from ele_common.functions.polyfit import exponenial_func
 
 
 def main():
