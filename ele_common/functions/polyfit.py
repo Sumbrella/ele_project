@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from ele_common.units import SingleFile, SinglePoint
 from scipy.optimize import curve_fit
 from sklearn.preprocessing import MinMaxScaler
 
@@ -14,7 +13,7 @@ def exponenial_func(input, a, b, c, d, e, f, g, h, i):
     return a * np.log(abs(b * input + ep)) + c * np.log(abs(d * input + ep)) ** 2 + e * np.log(abs(f * input + ep)) ** 3 + g * np.log(abs(h * input + ep)) ** 4 + i
 
 
-def fit_point(point:SinglePoint, show=False, maxfev=1000000):
+def fit_point(point, show=False, maxfev=1000000):
     scaler = MinMaxScaler()
     x_data = np.array(point.x)
     x_data = x_data * 100
@@ -36,6 +35,8 @@ def fit_point(point:SinglePoint, show=False, maxfev=1000000):
 
 
 if __name__ == '__main__':
+    from ele_common.units import SingleFile, SinglePoint
+
     before_file = SingleFile(before_filepath)
     after_file = SingleFile(after_filepath)
 

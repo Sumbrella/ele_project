@@ -1,5 +1,4 @@
 import sys
-sys.path.append('/Users/sumbrella/Documents/GitHub/ele_project')
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,18 +12,18 @@ class Generator:
         self.layer_number = None
         self.generate_times = 0
 
-    def generate(self, layer_numbers=None, debug=False):
+    def generate(self, layer_number=None, debug=False):
 
-        if layer_numbers is None:
-            layer_numbers = np.random.randint(
+        if layer_number is None:
+            layer_number = np.random.randint(
                 low=default_square_scope[0],
                 high=default_square_scope[1],
                 size=1
             )
 
-        depth = self._generate_depth(layer_numbers)
+        depth = self._generate_depth(layer_number)
 
-        res = self._generate_res(layer_numbers)
+        res = self._generate_res(layer_number)
 
         square = self._generate_square()
 
@@ -34,18 +33,16 @@ class Generator:
 
         db_data = np.abs(db_data)  # 加绝对值
 
+        # 增加扰动
+        res_data = self.add_perturbation(db_data)
+
         if debug is True:
             print("=====depth=====\n", depth)
             print("=====res=====\n", res)
             print("=====square=====\n", square)
             print("=====time=====\n", time)
             print("=====db_data=====\n", db_data)
-
-        # 拼接 data 和 time
-        db_data = np.stack((time, db_data), axis=1)
-
-        # 增加扰动
-        res_data = self.add_perturbation(db_data)
+            print("=====res_data====\n", res_data)
 
         return {
             'origin_data': db_data,
@@ -66,9 +63,9 @@ class Generator:
         # 扰动因子 k = 历史扰动数据的平方和开方分之一
         res_data = db_data.copy()
         k = 1
-        for index, b_data in enumerate(db_data[:, 1]):
+        for index, b_data in enumerate(res_data):
             perturbation_rate = np.random.randint(perturbation_scope[0], perturbation_scope[1]) / 100 / (k ** 0.5)
-            res_data[index][1] = b_data * (1 + perturbation_rate)
+            res_data[index] = b_data * (1 + perturbation_rate)
             k = k + perturbation_rate ** 2
     
         return res_data
@@ -132,5 +129,5 @@ class Generator:
 if __name__ == '__main__':
     generator = Generator()
     data = generator.generate(debug=True)
-    plt.plot(data[:, 0], data[:, 1])
+    plt.plot(data['time'], data['result_data'])
     plt.show()
