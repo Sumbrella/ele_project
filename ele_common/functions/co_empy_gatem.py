@@ -71,22 +71,24 @@ def loop_tem1d(time, L_square, depth, res, verb_flag=0):
 
 if __name__ == '__main__':
     gatem_results = np.abs(np.loadtxt('gatem_hf-df-Bz.dat'))
-    times = gatem_results[:, 0]
-    L_square = 1
+    # times = gatem_results[:, 0]
+    times = np.linspace(1e-5, 1e-2, 200)
+    L_square = 4
     # === ORIGIN ===
-    depth = [100, ]
-    res = [1e2, 1e2, ]
-    # depth = [100, 1000, 1100]
-    # res = [500, 30, 400, 0]
+    # depth = [100, ]
+    # res = [1e2, 1e2, ]
+    depth = [294.18952504, 593.43017307, 798.46889151, 1038.47326806]
+    res = [901.21992224, 1298.55058867, 1822.42005699, 1470.6401463, 893.07008395]
 
     EM_b, EM_db = loop_tem1d(times, L_square, depth, res, verb_flag=0)
 
     plt.figure(figsize=(9, 5))
     ax1 = plt.subplot(121)
     plt.title('Model Result')
+    print(np.abs(EM_db))
 
     # empymod
-    plt.plot(times, np.abs(gatem_results[:, 1]), 'b', label="GATEM_Fwd1D")
+    # plt.plot(times, np.abs(gatem_results[:, 1]), 'b', label="GATEM_Fwd1D")
     plt.plot(times, np.abs(EM_db), 'r--', label="empymod")
 
     # Plot settings
@@ -102,8 +104,8 @@ if __name__ == '__main__':
     ax2.yaxis.set_label_position("right")
     ax2.yaxis.tick_right()
 
-    plt.plot(times, np.abs(np.abs(EM_db)-np.abs(gatem_results[:, 1]))/np.abs(gatem_results[:, 1])*1e2, 'm.',
-             label=r"$|\Delta\,\mathrm{B}_\mathrm{z}|$")
+    # plt.plot(times, np.abs(np.abs(EM_db)-np.abs(gatem_results[:, 1]))/np.abs(gatem_results[:, 1])*1e2, 'm.',
+    #          label=r"$|\Delta\,\mathrm{B}_\mathrm{z}|$")
 
     # Plot settings
     plt.xscale('log')

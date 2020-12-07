@@ -1,5 +1,3 @@
-import sys
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -15,11 +13,7 @@ class Generator:
     def generate(self, layer_number=None, debug=False):
 
         if layer_number is None:
-            layer_number = np.random.randint(
-                low=default_square_scope[0],
-                high=default_square_scope[1],
-                size=1
-            )
+            layer_number = np.random.randint(default_layer_scope[0], default_layer_scope[1])
 
         depth = self._generate_depth(layer_number)
 
@@ -29,8 +23,7 @@ class Generator:
 
         time = self._generate_time()
 
-        _, db_data = loop_tem1d(time=time, L_square=square, depth=depth, res=res)
-
+        _, db_data = loop_tem1d(time=time, L_square=square, depth=depth, res=res, verb_flag=0)
         db_data = np.abs(db_data)  # 加绝对值
 
         # 增加扰动
@@ -56,18 +49,31 @@ class Generator:
 
     @staticmethod
     def add_perturbation(db_data, perturbation_scope=None):
+
         if perturbation_scope is None:
             perturbation_scope = default_perturbation_range
         # 增加扰动
         # B 数据 在其原始数据的 (-15 ~ 80) % 之间抖动
         # 扰动因子 k = 历史扰动数据的平方和开方分之一
-        res_data = db_data.copy()
+        res_data = [0 for _ in range(len(db_data))]
         k = 1
-        for index, b_data in enumerate(res_data):
-            perturbation_rate = np.random.randint(perturbation_scope[0], perturbation_scope[1]) / 100 / (k ** 0.5)
-            res_data[index] = b_data * (1 + perturbation_rate)
-            k = k + perturbation_rate ** 2
-    
+        # 方案1： 在原始时间上增加扰动
+        # for index, value in enumerate(db_data):
+        #     perturbation_rate = np.random.randint(perturbation_scope[0], perturbation_scope[1]) \
+        #             / 100 / (k ** 0.5)
+        #     res_data[index] = value * (1 + perturbation_rate)
+        #     k = k + perturbation_rate ** 2
+        #
+
+        # 方案2： 在上一个时间增加扰动
+        for index, value in enumerate(db_data):
+            last_value = db_data[index-1] if index > 0 else db_data[index]
+            perturbation_rate = np.random.randint(
+                    perturbation_scope[0], perturbation_scope[1]
+            ) / 100
+
+            res_data[index] = last_value * (1 + perturbation_rate)
+
         return res_data
 
     @staticmethod
@@ -84,6 +90,7 @@ class Generator:
 
     @staticmethod
     def _generate_depth(layer_number, scope=None):
+
         if scope is None:
             scope = default_deep_scope
 
@@ -106,13 +113,10 @@ class Generator:
         if scope is None:
             scope = default_square_scope
 
-        pre_square = np.random.randint(
-            default_square_scope[0],
-            default_square_scope[1],
+        square = np.random.randint(
+            scope[0],
+            scope[1],
         )
-
-        # min-max 划入 scope 范围内
-        square = scope[0] + pre_square * (scope[1] - scope[0])
 
         return square
 
@@ -128,6 +132,11 @@ class Generator:
 
 if __name__ == '__main__':
     generator = Generator()
+
     data = generator.generate(debug=True)
-    plt.plot(data['time'], data['result_data'])
+
+    plt.plot(data['time'], data['origin_data'], label='origin')
+    plt.plot(data['time'], data['result_data'], label='result', alpha=0.7)
+
+    plt.legend()
     plt.show()

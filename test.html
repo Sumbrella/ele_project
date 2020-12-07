@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+
+# Dynamic Programming
+## 从斐波那契开始
+
+$$
+Fib(n) = Fib(n - 1) - Fib(n - 2)
+$$
+---
+### 常规做法
+
+
+```cpp
+def fib(int n){
+    if ( n == 1 || n == 2 )
+        return 1;
+    else
+        return fib(n - 1) + fib(n - 2);
+}
+```
+---
+让我们看一下递归过程中每一个值被计算了多少次。
+
+```cpp
+
+int showArray(int *array, int n){
+    for (int i = 0; i < n - 1; i++){
+        printf("%d ", array[i]);
+    }
+    printf("%d\n", array[i]);
+
+    return 0;
+}
+
+int count[1000];  // 用于记录每一n被计算的次数
+
+int fib(int n){
+    count[n]++;    // 记录
+    if ( n == 1 || n == 2 ){
+        return 1;
+    }else
+        return fib(n - 1) + fib(n - 2);
+}
+
+int main(){
+    int n = 10;
+    fib(10);
+    showArray(count, n);
+
+    return 0;
+
+```
+***
+```plain
+out >>>
+fib(1) caculated 21 times
+fib(2) caculated 34 times
+fib(3) caculated 21 times
+fib(4) caculated 13 times
+fib(5) caculated 8 times
+fib(6) caculated 5 times
+fib(7) caculated 3 times
+fib(8) caculated 2 times
+fib(9) caculated 1 times
+fib(10) caculated 1 times
+Totle Time : 3.6e-05s
+```
+***
+<center>
+
+```mermaid
+graph TB
+A((10))
+B((9))
+C((8))
+D((8))
+E((7))
+
+A --> B
+A --> C
+B --> D
+B --> E
+```
+
+</center>
+
+`fib(10) = fib(9) + fib(8)` <-
+`fib(9) = fib(7) + fib(8)` <-
+
+`fib(8)` 被计算了两次，为什么不在计算的过程中直接保存 `fib(8)`的值呢
+
+---
+
+### 优化方案
+- 在每次计算一个节点后，就保存这个节点的值。
+- 在每次计算一个节点前，查询这个节点的值是否被保存。
+
+伪代码如下:
+```python
+def fib(n):
+    if is_saved(n):
+        return read_value(n) # 如果已经保存，那么直接读取
+    else:
+
+        if n == 1 or n == 2:
+            result = 1
+        else:
+            result = fib(n - 1) + fib(n - 2)
+
+        save_value(result, n)    # 记录计算完后的值
+        return result
+```
+---
+接下来考虑实现细节,
+在上面的为代码中， `is_saved`, `read_value`,`save_value` 等函数都可以直接用数组实现。
+
+以下是 cpp 实现
+```cpp
+#include <iostream>
+using namespace std;
+
+int fib(int n){
+    if ( saved[n] != 0 ){
+        return saved[n];
+    } else {
+        int result;
+        if ( n == 1 || n == 2 ){
+            result = 1;
+        } else {
+            count[n]++;  // 计算 fib(n) 被计算了多少次
+            result = fib(n - 1) + fib(n - 2);
+            saved[n] = result;
+        }
+        return result;
+    }
+}
+```
+***
+```plain
+out >>>
+fib(1) caculated 0 times
+fib(2) caculated 0 times
+fib(3) caculated 1 times
+fib(4) caculated 1 times
+fib(5) caculated 1 times
+fib(6) caculated 1 times
+fib(7) caculated 1 times
+fib(8) caculated 1 times
+fib(9) caculated 1 times
+fib(10) caculated 1 times
+Totle Time : 1.9e-05s
+```
+如果计算斐波那契的第30项，有：
+```
+out >>>
+Totle Time : 0.00447s
+Totle Time : 4.9e-05s
+```
+n仅仅取30时，优化后的fib相比就快了100倍。跨越了两个数量级。
+
+---
+## Drive into Dynamic Programming
+
+### 最菜的队员1
+> 彩虹岛集训队要选 $n-1$ 个队员去参加天梯赛，假设现在集训队有 $n$ 个成员。
+> 对于一个成员 $i$, 他 每隔 $t_i$ 分钟 能获得 $s_i$ 分
+> 团队希望能获得更高的分数，请你设计一个程序找出这个最菜的队员。
+
+
+| id | t| s |
+|:--:|:--:|:--:|
+| yd| 0| 10000000|
+| zzy| 1| 10000000|
+| lxh| 5| RuntimeError: overflow|
+| wjy| $\infty$| 0|
+---
+- 贪心
+在这个问题中，实际上就是要找出单位时间内获得分数最少的队员，所以对于每一个队员来说，只需要计算他的$\dfrac{s_i}{k_i}$ 然后再排序找到值最小的就可以了。
+
+> 上例中最次的队员是 wjy, 他的比值为0.
+---
+### 最菜的队员2
+
+> 彩虹岛集训队要选 $n-1$ 个队员去参加天梯赛，天梯赛有假设现在集训队有 $n$ 个成员，比赛时间为 $m$ 分钟。
+> 对于一个成员 $i$, 他 每隔 $t_i$ 分钟 能获得 $s_i$ 分。
+> 团队希望能在**比赛时间内**，获得尽**可能多的分数**，请你设计一个程序找出这个最菜的队员。
+---
+该问题不能用贪心的方式解决，我们可以举如下例子
+
+    假设 n = 2, m = 10, 队员如下:
+
+| id | t| s |
+|:--:|:--:|:--:|
+| lxh| 10 | 100|
+| wjy| 1e6 | 1e8|
+
+如果直接用贪心计算,那么 `wjy` 学长的比值为 `1e2` 要大于 `lxh` 学长的比值 `1e1`, 但是在时长 m = 10 的比赛中，`wjy` 学长并不能得分。
+此时，贪心算法无法找出最佳策略，~~让最菜的队员参加了比赛。~~
+
+---
+
+### 找钱问题
+>zzy是一个生意很好的商贩，但是他经商的城市没有支付宝，他只能给商家找零。
+为了能接待更多的客人，zzy需要尽可能快的找零。
+因此，找零时，他需要使用 **尽可能少的钞票数**
+这一天，yd 学长来他的店里买东西，已知zzy需要找给他 n 元。
+现在 zzy 有 `1元`, `5元` 和 `10元`的钞票无数张，
+请问 zzy 应该怎样给 yd 找零?
+
+#### 贪心方法
+
+
+### 冗余角度
+
+### 子问题角度
+
+## 经典动态规划问题
+
+### 最大连续和
+
+### 最长公共子序列
+
+## 进阶动态规划问题
+
+### 状态压缩
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
