@@ -94,11 +94,11 @@ fit_point(before_file.get_one_point(), show=True)
 ```
 对圆滑后的数据拟合如下:  
 
-![](https://github.com/Sumbrella/ele_project/raw/master/else/pic/after_fit_example.png)  
+![](https://github.com/Sumbrella/ele_project/raw/master/introduce/pic/after_fit_example.png)  
 
 对圆滑前的数据拟合如下:  
 
-![](https://github.com/Sumbrella/ele_project/raw/master/else/pic/before_fit_example.png)  
+![](https://github.com/Sumbrella/ele_project/raw/master/introduce/pic/before_fit_example.png)  
 
 **从上面的结果可以看出，直接拟合对圆滑后的图像拟合结果较好，对于圆滑前的图像具有一定的拟合能力，但是并不能满足要求。**
 
