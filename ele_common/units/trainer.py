@@ -15,6 +15,7 @@ class Trainer:
         self.train_losses = []
 
         self._mode = None
+        self._model = None
         self._optimizer = None
         self._name = name
 
@@ -45,7 +46,6 @@ class Trainer:
                         print("label:", labels.numpy())
                         print("logits:", logits.numpy())
                         print("loss:", loss.numpy())
-
 
                     avg_loss.backward()
                     optimizer.minimize(avg_loss)

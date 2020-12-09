@@ -5,7 +5,7 @@ import pandas as pd
 
 class SinglePoint:
 
-    def __init__(self, fp:TextIO, skip_line=2):
+    def __init__(self, fp: TextIO, skip_line=2):
         id = fp.readline()
         if id is None:
             raise RuntimeError('No more line exist in {}'.format(fp))
@@ -62,13 +62,10 @@ class SinglePoint:
         return np.array([self.x, self.y], dtype=dtype)
 
 
-def main():
+if __name__ == '__main__':
+    # TODO: change the path
     fp = open('../../data/origin/before/LINE_100_dbdt.dat', 'r')
     fp.readline()
     fp.readline()
     point_data = SinglePoint(fp)
     point_data.plot()
-
-
-if __name__ == '__main__':
-    main()

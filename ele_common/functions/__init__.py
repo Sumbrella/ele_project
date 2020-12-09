@@ -1,7 +1,10 @@
 __all__ = [
     'loop_tem1d',
-    'polyfit'
+    'polyfit',
+    'is_dir_exist',
+    'make_dir_with_input',
 ]
 
 from .polyfit import fit_point
 from .co_empy_gatem import loop_tem1d
+from .fcheck import is_dir_exist, make_dir_with_input

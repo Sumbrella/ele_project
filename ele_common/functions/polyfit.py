@@ -3,9 +3,6 @@ import numpy as np
 from scipy.optimize import curve_fit
 from sklearn.preprocessing import MinMaxScaler
 
-before_filepath = "../../data/origin/before/LINE_100_dbdt.dat"
-after_filepath = "../../data/origin/after/new_LINE_100_dbdt.dat"
-
 
 def exponenial_func(input, a, b, c, d, e, f, g, h, i):
     ep = 1e-7
@@ -36,6 +33,10 @@ def fit_point(point, show=False, maxfev=1000000):
 
 if __name__ == '__main__':
     from ele_common.units import SingleFile, SinglePoint
+
+    before_filepath = "../../data/origin/before/LINE_100_dbdt.dat"
+    after_filepath = "../../data/origin/after/new_LINE_100_dbdt.dat"
+
 
     before_file = SingleFile(before_filepath)
     after_file = SingleFile(after_filepath)
