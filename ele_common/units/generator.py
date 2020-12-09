@@ -1,3 +1,5 @@
+from math import log
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -90,7 +92,6 @@ class Generator:
 
     @staticmethod
     def _generate_depth(layer_number, scope=None):
-
         if scope is None:
             scope = default_deep_scope
 
@@ -109,7 +110,6 @@ class Generator:
 
     @staticmethod
     def _generate_square(scope=None):
-
         if scope is None:
             scope = default_square_scope
 
@@ -121,11 +121,20 @@ class Generator:
         return square
 
     @staticmethod
-    def _generate_time(time_sequence_number=None):
+    def _generate_time(time_sequence_number=None, time_range=None):
         if time_sequence_number is None:
             time_sequence_number = np.random.randint(default_time_scope[0], default_time_scope[1])
+        if time_range is None:
+            time_range = default_time_range
 
-        times = np.linspace(start=default_time_range[0], stop=default_time_range[1], num=time_sequence_number)
+        # 方案1: 等距取样
+        # times = np.linspace(start=default_time_range[0], stop=default_time_range[1], num=time_sequence_number)
+
+        # 方案2: 对数间隔取样
+        min_log_time, max_log_time = log(default_time_range[0]), log(default_time_range[1])
+
+        times = np.linspace(start=min_log_time, stop=max_log_time, num=time_sequence_number)
+        times = np.exp(times)
 
         return times
 
@@ -136,7 +145,7 @@ if __name__ == '__main__':
     data = generator.generate(debug=True)
 
     plt.plot(data['time'], data['origin_data'], label='origin')
-    plt.plot(data['time'], data['result_data'], label='result', alpha=0.7)
+    plt.plot(data['time'], data['result_data'], label='result', alpha=0.6)
 
     plt.legend()
     plt.show()
