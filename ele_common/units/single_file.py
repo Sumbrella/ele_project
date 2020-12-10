@@ -54,7 +54,7 @@ class SingleFile:
                 try:
                     yield SinglePoint(fp=self._fp, skip_line=2)
                 except Exception as e:
-                    # print(e)
+                    print(e)
                     # raise
                     break
             yield None

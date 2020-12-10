@@ -303,12 +303,10 @@ if __name__ == '__main__':
     # mode = 'debug'
     mode = 'train'
 
-
     with fluid.dygraph.guard():
         model = EleNetwork()
         # trainer = Trainer(name="ele", loss_function=fluid.layers.square_error_cost)
         reader = Reader(train=train_reader, test=test_reader)
-
 
         model.train()
         optimizer = fluid.optimizer.Adam(learning_rate=lr, parameter_list=model.parameters())
@@ -331,7 +329,6 @@ if __name__ == '__main__':
                     print("logits:", logits.numpy())
                     print("loss:", loss.numpy())
                     print("avg_loss:", avg_loss.numpy())
-
 
                 avg_loss.backward()
 
@@ -357,7 +354,6 @@ if __name__ == '__main__':
                 avg_loss = fluid.layers.mean(loss)
                 # accuracy = fluid.layers.accuracy(logits, labels)
                 # accuracies.append(accuracy.numpy())
-
 
             print(f"epoch:{epoch} test_result: loss | {np.mean(avg_loss.numpy())}")
             model.train()

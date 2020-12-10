@@ -145,7 +145,7 @@ if __name__ == '__main__':
             for batch, data in enumerate(reader.train()):
                 imgs, labels = data
                 # imgs = np.log(imgs)
-                # change teacher label value
+                # change data label value
                 labels = change_teacher(labels)
 
                 imgs = fluid.dygraph.to_variable(imgs)

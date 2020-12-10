@@ -46,6 +46,6 @@ def fit_dir(dir_path, save_path, show=False):
 
 
 if __name__ == '__main__':
-    fit_dir(os.path.join(train_dir, 'after'), save_path=os.path.join(train_dir, 'teacher'), show=False)
-    fit_dir(os.path.join(test_dir, 'after'), save_path=os.path.join(test_dir, 'teacher'), show=False)
-    # fit_file("../../data/train/after/new_LINE_100_dbdt.dat", "../../data/train/after/teacher")
+    fit_dir(os.path.join(train_dir, 'after'), save_path=os.path.join(train_dir, 'data'), show=False)
+    fit_dir(os.path.join(test_dir, 'after'), save_path=os.path.join(test_dir, 'data'), show=False)
+    # fit_file("../../teacher/train/after/new_LINE_100_dbdt.teacher", "../../teacher/train/after/data")

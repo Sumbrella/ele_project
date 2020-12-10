@@ -23,7 +23,7 @@ def get_reader(data_dir, csv_dir, batch_size=10, debug=False, dtype='float32'):
         for file_name in os.listdir(data_dir):
 
             if debug:
-                print('[INFO] getting data from {}'.format(file_name))
+                print('[INFO] getting teacher from {}'.format(file_name))
 
             file_path = os.path.join(data_dir, file_name)
             file_name, ext = os.path.splitext(file_name)

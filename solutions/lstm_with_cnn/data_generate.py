@@ -24,7 +24,7 @@ def generate_data(save_dir, file_name, generate_number):
 
         data = EleData(data)        # 模块化
 
-        logger.info('checking data')
+        logger.info('checking teacher')
 
         if checker.check(data.time, data.origin_data):     # 若通过检查, 则保存
 
@@ -40,10 +40,11 @@ def generate_data(save_dir, file_name, generate_number):
 
 
 if __name__ == '__main__':
+    START_FILE_ID = 1
     ONE_FILE_NUMBER = 100
-    for generate_id in range(1, 1000):
+    for id in range(START_FILE_ID, 3000):
         generate_data(
             generate_number=ONE_FILE_NUMBER,
             save_dir='../../data/generate',
-            file_name='LINE_{:03d}_dbdt'.format(generate_id)
+            file_name='LINE_{:04d}_dbdt'.format(id)
         )

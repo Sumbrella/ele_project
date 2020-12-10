@@ -29,9 +29,9 @@ class EleData:
     @staticmethod
     def _dir_init(save_dir):
         # 用于保存教师数据
-        teacher_dir = os.path.join(save_dir, 'teacher')
+        teacher_dir = os.path.join(save_dir, 'data')
         # 用于保存扰动数据
-        data_dir = os.path.join(save_dir, 'data')
+        data_dir = os.path.join(save_dir, 'teacher')
         # 用于保存其他标签
         label_dir = os.path.join(save_dir, 'label')
 
@@ -65,8 +65,9 @@ class EleData:
             # 如果不存在文件，则创建文件并写入 0 和 日期
             fp = open(os.path.join(full_path), 'w')
             fp.write(' 0\n')
-
-            fp.write(' ' + time.asctime())
+            fp.write(" ")
+            fp.write(time.asctime())
+            fp.write("\n")
 
         with open(os.path.join(full_path), 'r+') as fp:
             # 读取第一行的point数目，并令其+1
@@ -101,8 +102,8 @@ class EleData:
         data_dir = os.path.join(save_dir, 'data')
         label_dir = os.path.join(save_dir, 'label')
 
-        self._add_point_to_file(os.path.join(teacher_dir, file_name + '.dat'), which='origin')
-        self._add_point_to_file(os.path.join(data_dir, 'NEW_' + file_name + '.dat'), which='result')
+        self._add_point_to_file(os.path.join(data_dir, file_name + '.dat'), which='origin')
+        self._add_point_to_file(os.path.join(teacher_dir, 'NEW_' + file_name + '.dat'), which='result')
         self._add_point_label(os.path.join(label_dir, file_name + '.csv'))
 
 
@@ -122,4 +123,3 @@ if __name__ == '__main__':
     plt.plot(ele_data.time, ele_data.result_data, label='added')
     plt.legend()
     plt.show()
-

@@ -5,7 +5,7 @@ import numpy as np
 class Reader:
     """
     this class has method "train" "test" which will return
-    a data generator with batch_size(=10)
+    a teacher generator with batch_size(=10)
     """
     def __init__(self, train, test):
         self.train = train
@@ -25,7 +25,7 @@ class Reader:
                 labels.append(np.reshape(label, label_shape).astype('int64'))
 
                 if len(data) == batch_size:
-                    # data = np.array(imgs, 'float32').reshape(batch_size, 1, 28, 28)
+                    # teacher = np.array(imgs, 'float32').reshape(batch_size, 1, 28, 28)
                     # labels = np.array(labels, 'int32').reshape(len(labels), -1)
                     yield np.array(data), np.array(labels)
                     data = []

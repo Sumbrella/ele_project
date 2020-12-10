@@ -28,7 +28,7 @@ def main():
         data = one_point.get_data()
 
         data = np.array(data, 'float32').reshape(1, 2, 1, 100)
-        # data.res
+        # teacher.res
         data = fluid.dygraph.to_variable(data)
 
         logits = model(data)

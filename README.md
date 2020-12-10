@@ -25,7 +25,7 @@ __读取一个点的示例__:
 ```python
 from ele_common.units import SingleFile
 
-singlefile = SingleFile(filepath='../../data/origin/before/LINE_120_dbdt.dat')
+singlefile = SingleFile(filepath='../../teacher/origin/before/LINE_120_dbdt.teacher')
 print(singlefile._date)
 print(singlefile.filename)
 point = singlefile.get_one_point()
@@ -94,11 +94,11 @@ fit_point(before_file.get_one_point(), show=True)
 ```
 对圆滑后的数据拟合如下:  
 
-![](https://github.com/Sumbrella/ele_project/raw/master/introduce/pic/after_fit_example.png)  
+![](https://github.com/Sumbrella/ele_project/raw/master/docs/pic/after_fit_example.png)  
 
 对圆滑前的数据拟合如下:  
 
-![](https://github.com/Sumbrella/ele_project/raw/master/introduce/pic/before_fit_example.png)  
+![](https://github.com/Sumbrella/ele_project/raw/master/docs/pic/before_fit_example.png)  
 
 **从上面的结果可以看出，直接拟合对圆滑后的图像拟合结果较好，对于圆滑前的图像具有一定的拟合能力，但是并不能满足要求。**
 
@@ -205,15 +205,32 @@ class AlexNet(fluid.dygraph.Layer):
 
 ```
 
+### 3. 数据生成
+为了使用理论值进行数据处理，本项目基于开源库 `enmopy` 生成单点的一维数据。
+生成参数如下:   
+
+| 参数名称 | 参数范围 |
+| :---: | :---: |
+| 每层深度 |  [5, 300] |
+| 电阻率 | [10, 400] | 
+| 层数| [2, 5] |
+| 时间采样数|  [200, 300]|
+| 时序范围| [1e-4, 1e-2] |
+| 扰动率    |   [-80%, 80% ]          |
+
+基于实际测量数据的情况，靠后的扰动率一般较小，因此，本模型在生成数据时，
+定义了抗扰动因子，它是基于历史扰动情况的一个参数，历史附加的扰动率越大，
+对当前扰动的抑制率就越高。
+
 ### 4. 网络的训练
 ```python
     import numpy as np
     from ele_common.units import SingleFile, Reader
 
-    train_dir = "../../data/train/before"
-    train_label_dir = "../../data/train/teacher"
-    test_dir = "../../data/test/before"
-    test_label_dir = "../../data/test/teacher"
+    train_dir = "../../teacher/train/before"
+    train_label_dir = "../../teacher/train/data"
+    test_dir = "../../teacher/test/before"
+    test_label_dir = "../../teacher/test/data"
 
     mode = 'train'
     epoch_num = 150
@@ -321,7 +338,7 @@ from ele_common.functions.polyfit import exponenial_func
 
 
 def main():
-    data_path = "../../data/train/before/LINE_100_dbdt.dat"
+    data_path = "../../teacher/train/before/LINE_100_dbdt.teacher"
 
     with fluid.dygraph.guard():
         model = AlexNet()
@@ -338,7 +355,7 @@ def main():
         data = one_point.get_data()
 
         data = np.array(data, 'float32').reshape(1, 2, 1, 100)
-        # data.res
+        # teacher.res
         data = fluid.dygraph.to_variable(data)
 
         logits = model(data)

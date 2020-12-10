@@ -27,7 +27,7 @@ class Checker:
         m = len(y)
 
         if n != m:
-            logger.error('In module Checker.check, the x data and y data should have the same size'
+            logger.error('In module Checker.check, the x teacher and y teacher should have the same size'
                          'but x:{} | y:{}'.format(n, m))
             raise ValueError('shape can not be difference')
 

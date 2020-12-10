@@ -70,7 +70,7 @@ def loop_tem1d(time, L_square, depth, res, verb_flag=0):
 
 
 if __name__ == '__main__':
-    gatem_results = np.abs(np.loadtxt('gatem_hf-df-Bz.dat'))
+    gatem_results = np.abs(np.loadtxt('gatem_hf-df-Bz.teacher'))
     # times = gatem_results[:, 0]
     times = np.linspace(1e-5, 1e-2, 200)
     L_square = 4
