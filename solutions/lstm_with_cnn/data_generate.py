@@ -40,11 +40,16 @@ def generate_data(save_dir, file_name, generate_number):
 
 
 if __name__ == '__main__':
-    START_FILE_ID = 1
+    """
+    1->200 +-80
+    200->400 +-950
+    """
+    START_FILE_ID = 201
     ONE_FILE_NUMBER = 100
-    for id in range(START_FILE_ID, 3000):
+    for id in range(START_FILE_ID, START_FILE_ID + 200):
         generate_data(
             generate_number=ONE_FILE_NUMBER,
             save_dir='../../data/generate',
-            file_name='LINE_{:04d}_dbdt'.format(id)
+            file_name='LINE_{:04d}_dbdt'.format(id),
+            perturbation_rate=50
         )

@@ -1,6 +1,6 @@
 from __future__ import division, absolute_import, print_function
 
-hard_dependencies = ('matplotlib', 'csv', 'loguru', 'numpy', 'empymod', 'scipy', 'sklearn')
+hard_dependencies = ('matplotlib', 'csv', 'loguru', 'numpy', 'empymod', 'scipy', 'sklearn', 'argparse')
 missing_dependencies = []
 
 for dependency in hard_dependencies:

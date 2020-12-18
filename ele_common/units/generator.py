@@ -8,9 +8,20 @@ from solutions.lstm_with_cnn.config import *
 
 
 class Generator:
-    def __init__(self):
-        self.layer_number = None
-        self.generate_times = 0
+    def __init__(self,
+                 layer_number=None,
+                 depth_scope=None,
+                 resistant_scope=None,
+                 time_sequence_number=None,
+                 time_scope=None,
+                 perturbation_scope=None
+                 ):
+        self.layer_number = layer_number
+        self.depth_scope = depth_scope
+        self.resistant_scope = resistant_scope
+        self.time_scope = time_scope
+        self.time_sequence_number = time_sequence_number
+        self.perturbation_scope = perturbation_scope
 
     def generate(self, layer_number=None, debug=False):
 
@@ -29,7 +40,7 @@ class Generator:
         db_data = np.abs(db_data)  # 加绝对值
 
         # 增加扰动
-        res_data = self.add_perturbation(db_data)
+        res_data = self.add_perturbation(db_data, self.perturbation_rate)
 
         if debug is True:
             print("=====depth=====\n", depth)
@@ -49,11 +60,11 @@ class Generator:
             'square': square,
         }
 
-    @staticmethod
-    def add_perturbation(db_data, perturbation_scope=None):
-
-        if perturbation_scope is None:
+    def add_perturbation(self, db_data):
+        perturbation_scope = self.perturbation_scope
+        if self.perturbation_scope is None:
             perturbation_scope = default_perturbation_range
+
         # 增加扰动
         # B 数据 在其原始数据的 (-15 ~ 80) % 之间抖动
         # 扰动因子 k = 历史扰动数据的平方和开方分之一
@@ -78,24 +89,20 @@ class Generator:
 
         return res_data
 
-    @staticmethod
-    def _generate_res(layer_number, scope=None):
-        if scope is None:
-            scope = default_res_scope
+    def _generate_res(self):
+        scope = default_res_scope if self.resistant_scope is None else self.resistant_scope
 
         # 在 0 - 1 内 生成随机数
-        pre_res = np.random.random_sample(layer_number + 1)
+        pre_res = np.random.random_sample(self.layer_number + 1)
         # min-max 划入 scope 范围内
         res = scope[0] + pre_res * (scope[1] - scope[0])
 
         return res
 
-    @staticmethod
-    def _generate_depth(layer_number, scope=None):
-        if scope is None:
-            scope = default_deep_scope
+    def _generate_depth(self):
+        scope = default_res_scope if self.depth_scope is None else self.depth_scope
 
-        pre_depth = np.random.random_sample(layer_number)
+        pre_depth = np.random.random_sample(self.layer_number)
 
         # min-max 划入 scope 范围内
         depths = scope[0] + pre_depth * (scope[1] - scope[0])
@@ -108,10 +115,8 @@ class Generator:
 
         return depths
 
-    @staticmethod
-    def _generate_square(scope=None):
-        if scope is None:
-            scope = default_square_scope
+    def _generate_square(self):
+        scope = default_square_scope if self.squared is None else self.square_scope
 
         square = np.random.randint(
             scope[0],
@@ -120,20 +125,18 @@ class Generator:
 
         return square
 
-    @staticmethod
-    def _generate_time(time_sequence_number=None, time_range=None):
-        if time_sequence_number is None:
-            time_sequence_number = np.random.randint(default_time_scope[0], default_time_scope[1])
-        if time_range is None:
-            time_range = default_time_range
+    def _generate_time(self):
+        scope = default_time_scope if self.time_sequence_number is None else self.time_sequence_number
+        generate_number = np.random.randint(scope[0], scope[1])
+        time_range = default_time_range if self.time_scope is None else self.time_scope
 
         # 方案1: 等距取样
         # times = np.linspace(start=default_time_range[0], stop=default_time_range[1], num=time_sequence_number)
 
         # 方案2: 对数间隔取样
-        min_log_time, max_log_time = log(default_time_range[0]), log(default_time_range[1])
+        min_log_time, max_log_time = log(time_range[0]), log(time_range[1])
 
-        times = np.linspace(start=min_log_time, stop=max_log_time, num=time_sequence_number)
+        times = np.linspace(start=min_log_time, stop=max_log_time, num=generate_number)
         times = np.exp(times)
 
         return times
