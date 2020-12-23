@@ -106,6 +106,24 @@ class EleData:
         self._add_point_to_file(os.path.join(teacher_dir, 'NEW_' + file_name + '.dat'), which='result')
         self._add_point_label(os.path.join(label_dir, file_name + '.csv'))
 
+    def draw(self):
+        import matplotlib.pyplot as plt
+        plt.plot(
+            self.time,
+            self.origin_data,
+            alpha=1,
+            label='origin',
+        )
+        plt.plot(
+            self.time,
+            self.result_data,
+            alpha=0.7,
+            ls='--',
+            label="result",
+        )
+        plt.legend()
+        plt.show()
+
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
