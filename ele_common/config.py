@@ -9,4 +9,4 @@ default_square_scope = [1, 5]
 default_time_scope = [200, 300]  # [150, 300]
 default_time_range = [1e-4, 1e-2]
 
-default_perturbation_range = [-80, 80]
+default_perturbation_rate = 80
