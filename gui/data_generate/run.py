@@ -1,4 +1,7 @@
+from time import sleep
+
 from loguru import logger
+from colored import stylize, attr, fg
 from gooey import Gooey, GooeyParser
 
 from ele_common.units import Generator
@@ -8,22 +11,59 @@ from ele_common.functions import is_dir_exist
 from ele_common.functions import make_dir_with_input
 
 
-def generate_data(save_dir, file_name, generate_number, generator=None):
+# class Logger:
+#
+#     level2col = {
+#         'INFO' : 'blue',
+#         'ERROR': 'red',
+#         'WARN' : 'yellow'
+#     }
+#
+#     def __init__(self):
+#         pass
+#
+#     @classmethod
+#     def log(cls, level, message):
+#         print(stylize("{}\t".format(level), fg(cls.level2col[level])))
+#         print(stylize("{}".format(message), attr("underlined")))
+#
+#     @classmethod
+#     def info(cls, message):
+#         cls.log('INFO', message)
+#
+#     @classmethod
+#     def error(cls, message):
+#         cls.log('ERROR', message)
+#
+#     @classmethod
+#     def warning(cls, message):
+#         cls.log('WARN', message)
+
+
+# logger = Logger()
+
+
+def generate_data(save_dir, file_name, generate_number, generator=None, debug=False):
 
     if not is_dir_exist(save_dir):
         make_dir_with_input(save_dir)
 
     generator = generator or Generator()
+
     checker = Checker()
 
     for generate_id in range(generate_number):
         logger.info('generating data...')
 
         data = generator.generate()
-
+        # print(data)
         logger.info('generate succeed!')
 
         data = EleData(data)        # 模块化
+
+        if debug:
+            data.draw()
+            sleep(1)
 
         logger.info('checking teacher')
 
@@ -46,7 +86,6 @@ def program_run(args):
     """
     START_FILE_ID = 0
     ONE_FILE_NUMBER = 100
-    print([args.lmi, args.lma])
     generator_dir = args.gd
     generator_times = args.gn
     generator = Generator(
@@ -64,25 +103,49 @@ def program_run(args):
             save_dir=generator_dir,
             file_name='LINE_{:03d}_dbdt'.format(i),
             generator=generator,
+            debug=args.de
         )
 
 
 
 @Gooey(
-    advanced=True,
-    auto_start=True,
     program_name='electronic data generator',
 )
 def main():
 
     parser = GooeyParser()
 
+    # ================
+    # generator directory
     parser.add_argument(
         "gd",
         metavar="generate directory",
         help="Path to the directory you want to generate data",
         widget="DirChooser",
         # metavar="METAVAR"
+    )
+
+    # Debug
+    parser.add_argument(
+        "-de",
+        choices=["True", "False"],
+        metavar="debug",
+        default='False',
+    )
+
+    # ================
+    # perturbation rate
+    parser.add_argument(
+        "pr",
+        metavar="perturbation rate",
+        type=int,
+        gooey_options={
+            'validator': {
+               'test'   : '0 <= int(user_input) <= 80',
+               'message': 'Must be between 0 and 80'
+            }
+        },
+        default=50,
     )
 
     parser.add_argument(
@@ -173,7 +236,6 @@ def main():
     resistant_group.add_argument(
         'rmi',
         metavar='resistant minimum',
-
         type=int,
         gooey_options={
             'validator': {
@@ -187,12 +249,11 @@ def main():
     resistant_group.add_argument(
         'rma',
         metavar='resistant maximum',
-
         type=int,
         gooey_options={
             'validator': {
                 'test'   : '200 <= int(user_input) <= 700',
-                'message': 'Must be between 10 and 700'
+                'message': 'Must be between 200 and 700'
             },
         },
         default=300,
@@ -207,7 +268,7 @@ def main():
 
     depth_group.add_argument(
         'dmi',
-        metavar='resistant minimum',
+        metavar='depth minimum',
 
         type=int,
         gooey_options={
@@ -221,7 +282,7 @@ def main():
 
     depth_group.add_argument(
         'dma',
-        metavar='resistant maximum',
+        metavar='depth maximum',
         type=int,
         gooey_options={
             'validator': {
@@ -242,25 +303,24 @@ def main():
     time_scope_group.add_argument(
         'tmi',
         metavar='time minimum',
-
-        type=int,
+        type=float,
         gooey_options={
             'validator': {
-                'test'   : '4 <= int(user_input) <= 5',
-                'message': 'Must be between 4 and 5'
+                'test'   : '4 <= float(user_input) <= 6',
+                'message': 'Must be between 4 and 6'
             }
         },
-        default=5,
+        default=4,
     )
 
     time_scope_group.add_argument(
         'tma',
         metavar='time maximum',
-        type=int,
+        type=float,
         gooey_options={
             'validator': {
-                'test'   : '2 <= int(user_input) <= 3',
-                'message': 'Must be between 2 and 3'
+                'test'   : '0 <= float(user_input) <= 3',
+                'message': 'Must be between 0 and 3'
             }
         },
         default=2,
@@ -290,7 +350,6 @@ def main():
     time_number_group.add_argument(
         'nma',
         metavar='time maximum',
-
         type=int,
         gooey_options={
             'validator': {
@@ -302,23 +361,10 @@ def main():
         help="10e5"
     )
 
-    # ================
-    # perturbation rate
-    parser.add_argument(
-        "pr",
-        metavar="perturbation rate",
-        type=int,
-        gooey_options={
-            'validator': {
-               'test'   : '0 <= int(user_input) <= 80',
-               'message': 'Must be between 0 and 80'
-            }
-        },
-        default=50,
-    )
-
     args = parser.parse_args()
-
+    args.tmi = 10 ** (-args.tmi)
+    args.tma = 10 ** (-args.tma)
+    args.de = True if args.de == 'True' else False
     print(args)
 
     program_run(args)
