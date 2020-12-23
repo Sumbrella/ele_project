@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from ele_common.functions import loop_tem1d
-from solutions.lstm_with_cnn.config import *
+from ele_common.config import *
 
 
 class Generator:
@@ -80,7 +80,7 @@ class Generator:
         for index, value in enumerate(db_data):
             last_value = db_data[index-1] if index > 0 else db_data[index]
             pr = np.random.randint(
-                    -perturbation_rate, + perturbation_rate
+                    -perturbation_rate / 3, perturbation_rate
             ) / 100
 
             res_data[index] = last_value * (1 + pr)
