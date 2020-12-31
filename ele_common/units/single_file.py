@@ -43,21 +43,18 @@ class SingleFile:
         return self._remind_point_number
 
     def _init_title(self, fp):
-
         self._point_number = eval(fp.readline())
         self._remind_point_number = self._point_number
         self._date = fp.readline()
 
     def _init_point_reader(self):
-        def reader():
-            while True:
+        def reader() -> SinglePoint:
+            for _ in range(self.point_number):
                 try:
-                    yield SinglePoint(fp=self._fp, skip_line=2)
+                    yield SinglePoint.from_file(fp=self._fp, skip_line=2)
                 except Exception as e:
                     print(e)
-                    # raise
-                    break
-            yield None
+                    raise
 
         self._point_reader = reader
 
@@ -65,25 +62,20 @@ class SingleFile:
 
         if self._point_number is None:
             raise ValueError('in SingleFile._read_point, no point_number existed, please read point_number first')
-        point = SinglePoint(fp=self._fp, skip_line=2)
+        point = SinglePoint.from_file(fp=self._fp, skip_line=2)
 
         return point
 
     def get_reader(self, batch_size=10):
-
         def reader():
             points = []
             for point_id, point in enumerate(self.point_reader()):
-
                 if point is None:
                     break
-
                 points.append(point)
-
                 if len(points) is batch_size:
                     yield points
                     points = []
-
             if len(points):
                 yield points
 

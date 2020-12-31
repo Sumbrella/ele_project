@@ -9,9 +9,15 @@ def input_choice(continue_option):
     return False
 
 
-def is_dir_exist(path):
+def is_path_exist(path):
     if not os.path.exists(path):
-        print()
+        return False
+    return True
+
+
+def check_ext(filename, target_ext):
+    _, ext = os.path.splitext(filename)
+    if ext != "." + target_ext:
         return False
     return True
 

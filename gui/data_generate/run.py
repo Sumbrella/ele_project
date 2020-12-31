@@ -1,13 +1,12 @@
 from time import sleep
 
 from loguru import logger
-from colored import stylize, attr, fg
 from gooey import Gooey, GooeyParser
 
 from ele_common.units import Generator
 from ele_common.units import EleData
 from ele_common.units import Checker
-from ele_common.functions import is_dir_exist
+from ele_common.functions import is_path_exist
 from ele_common.functions import make_dir_with_input
 
 
@@ -45,7 +44,7 @@ from ele_common.functions import make_dir_with_input
 
 def generate_data(save_dir, file_name, generate_number, generator=None, debug=False):
 
-    if not is_dir_exist(save_dir):
+    if not is_path_exist(save_dir):
         make_dir_with_input(save_dir)
 
     generator = generator or Generator()

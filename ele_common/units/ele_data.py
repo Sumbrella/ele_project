@@ -3,7 +3,8 @@ import csv
 
 from loguru import logger
 
-from ..functions import is_dir_exist
+from .single_point import SinglePoint
+from ..functions import is_path_exist
 from ..functions import make_dir_with_input
 
 
@@ -35,55 +36,34 @@ class EleData:
         # 用于保存其他标签
         label_dir = os.path.join(save_dir, 'label')
 
-        if not is_dir_exist(save_dir):
+        if not is_path_exist(save_dir):
             make_dir_with_input(path=save_dir)
 
-        if not is_dir_exist(teacher_dir):
+        if not is_path_exist(teacher_dir):
             os.mkdir(teacher_dir)
 
-        if not is_dir_exist(data_dir):
+        if not is_path_exist(data_dir):
             os.mkdir(data_dir)
 
-        if not is_dir_exist(label_dir):
+        if not is_path_exist(label_dir):
             os.mkdir(label_dir)
 
     def _add_point_to_file(self, full_path, which):
-
-        if which not in ['origin', 'result']:
-            logger.error('param \'which\' should be \'origin \' or \' result \'')
-            raise ValueError('param \'which\' should be \'origin \' or \' result \'')
-
-        save_data = None
 
         if which == 'origin':
             save_data = self.origin_data
         elif which == 'result':
             save_data = self.result_data
+        else:
+            logger.error('param \'which\' should be \'origin \' or \' result \'')
+            raise ValueError('param \'which\' should be \'origin \' or \' result \'')
 
-        if not os.path.exists(full_path):
-            import time
-            # 如果不存在文件，则创建文件并写入 0 和 日期
-            fp = open(os.path.join(full_path), 'w')
-            fp.write(' 0\n')
-            fp.write(" ")
-            fp.write(time.asctime())
-            fp.write("\n")
+        save_point = SinglePoint(
+            size=len(self.time),
+            data=zip(self.time, save_data)
+        )
 
-        with open(os.path.join(full_path), 'r+') as fp:
-            # 读取第一行的point数目，并令其+1
-            point_number = int(fp.readline())
-            fp.seek(0)
-            fp.writelines(' {}\n'.format(point_number + 1))
-
-        with open(os.path.join(full_path), 'a+') as fp:
-            # 写入一个point
-            fp.write(' {}\n'.format(point_number + 1))
-            fp.write(' 1   2   3   4\n')
-            fp.write(' xy\n')
-            fp.write(' {}\n'.format(len(self.time)))
-
-            for x, y in zip(self.time, save_data):
-                fp.write(' {:e}\t\t{:e}\n'.format(x, y))
+        save_point.add_to_file(full_path)
 
     def _add_point_label(self, full_path):
         with open(full_path, 'a+') as cv:

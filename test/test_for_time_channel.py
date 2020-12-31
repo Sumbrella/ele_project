@@ -17,7 +17,8 @@ if __name__ == '__main__':
 
         EM_b, EM_db = loop_tem1d(times, L_square, depth, res, verb_flag=0)
         plt.subplot(4, 4, index + 1)
-        plt.title(f"channels: {channel}")
+        plt.title(f"channels: {channel}", fontsize=8)
+        plt.xticks(None)
         plt.plot(times, np.abs(EM_db), 'r--')
 
     plt.show()

@@ -3,13 +3,13 @@ from loguru import logger
 from ele_common.units import Generator
 from ele_common.units import EleData
 from ele_common.units import Checker
-from ele_common.functions import is_dir_exist
+from ele_common.functions import is_path_exist
 from ele_common.functions import make_dir_with_input
 
 
 def generate_data(save_dir, file_name, generate_number):
 
-    if not is_dir_exist(save_dir):
+    if not is_path_exist(save_dir):
         make_dir_with_input(save_dir)
 
     generator = Generator()
@@ -44,12 +44,12 @@ if __name__ == '__main__':
     1->200 +-80
     200->400 +-950
     """
-    START_FILE_ID = 201
+    START_FILE_ID = 1000
     ONE_FILE_NUMBER = 100
     for id in range(START_FILE_ID, START_FILE_ID + 200):
         generate_data(
             generate_number=ONE_FILE_NUMBER,
             save_dir='../../data/generate',
             file_name='LINE_{:04d}_dbdt'.format(id),
-            perturbation_rate=50
+            # perturbation_rate=50,
         )
