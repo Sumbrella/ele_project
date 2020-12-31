@@ -1,5 +1,7 @@
 import tensorflow as tf
+from tqdm import tqdm
 from tensorflow.keras import layers
+from tensorflow.keras import backend as K
 from solutions.cnn_coder.coders import Encoder, Decoder
 
 
@@ -20,18 +22,39 @@ class CnnModel(tf.keras.Model):
         return outputs
 
 
+# def handle_input(inputs, max_input_length):
+#     # inputs: (N, H, W, C)
+#     outputs = []
+#     for input in inputs:
+#         length = input.shape[2]
+#         output = np.pad(input,
+#                         pad_width=((0, 0), (0, max_input_length - length), (0, 0)),
+#                         constant_values=(0, 0),
+#                         )
+#         output = np.tile(output, reps=[3, 1, 1])
+#         outputs.append(output.tolist())
+#     return outputs
+
+
 def handle_input(inputs, max_input_length):
     # inputs: (N, H, W, C)
     outputs = []
-    for input in inputs:
-        length = input.shape[2]
-        output = np.pad(input,
-                        pad_width=((0, 0), (0, max_input_length - length), (0, 0)),
-                        constant_values=(0, 0),
-                        )
-        output = np.tile(output, reps=[3, 1, 1])
-        outputs.append(output.tolist())
-    return outputs
+    with tqdm(total=len(inputs)) as pbar:
+        for input in inputs:
+            pbar.set_description("Handling data...")
+            length = input.shape[2]
+            output = np.pad(input,
+                            pad_width=((0, 0), (0, max_input_length - length), (0, 0)),
+                            constant_values=(0, 0),
+                            )
+            # input = output
+            output = np.tile(output, reps=[3, 1, 1])
+            outputs.append(output.tolist())
+            # outputs = np.vstack([outputs, output])
+            pbar.update(1)
+    outputs = np.array(outputs).flatten().reshape(len(inputs), 1, -1, 2)
+    # return outputs
+    return K.cast_to_floatx(outputs)
 
 
 if __name__ == '__main__':
@@ -45,10 +68,12 @@ if __name__ == '__main__':
     fp = open("../../data/origin/before/LINE_100_dbdt.dat", "r+")
     fp.readline()
     fp.readline()
+
     point = SinglePoint.from_file(fp)
 
     test_x = [point.get_data(), point.get_data()]
     test_x = np.array(test_x).reshape(2, 1, -1, 2)
+    print(test_x)
 
     test_x = handle_input(test_x, 500)
     test_y = test_x

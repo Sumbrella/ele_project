@@ -1,3 +1,6 @@
+import sys
+sys.path.append("../..")
+
 import numpy as np
 from argparse import ArgumentParser
 from tqdm import tqdm
@@ -5,58 +8,45 @@ from loguru import logger
 from tensorflow import keras
 from ele_common.units import SingleFile
 from solutions.cnn_coder.model import CnnModel
+from tensorflow.keras import backend as K
 
 
-def read_data(data_path, placeholder):
+def read_data(data_path, placeholder, max_input_length=500):
     logger.info("Logging data {}...".format(placeholder))
 
     sf = SingleFile(data_path)
-    all_point_number = sf.point_number
     data = []
+    all_point_number = 50
+    # all_point_number = sf.point_number
     # total参数设置进度条的总长度
     with tqdm(total=all_point_number) as pbar:
         pbar.set_description("Reading {}".format(placeholder))
         for i in range(all_point_number):
-            data.append(sf.get_one_point().get_data())
-            pbar.update(1)
-
-    data = np.array(data).reshape(all_point_number, 1, -1, 2)
-
-    logger.success("{} data read Done!".format(placeholder))
-
-    return data
-
-
-def handle_input(inputs, max_input_length):
-    # inputs: (N, H, W, C)
-    outputs = []
-    with tqdm(total=len(inputs)) as pbar:
-        for input in inputs:
-            pbar.set_description("Handling data...")
-            length = input.shape[2]
-            output = np.pad(input,
+            point = sf.get_one_point()
+            one_data = point.get_data()
+            one_data = np.array(one_data).reshape(1, -1, 2)
+            length = point.size
+            output = np.pad(one_data,
                             pad_width=((0, 0), (0, max_input_length - length), (0, 0)),
                             constant_values=(0, 0),
                             )
             output = np.tile(output, reps=[3, 1, 1])
-            outputs.append(output.tolist())
+            data.append(output.tolist())
             pbar.update(1)
 
-    return np.array(outputs)
+    return K.cast_to_floatx(np.array(data))
 
 
 @logger.catch
-def train(train_path, teacher_path):
+def train(train_path, teacher_path, core_size, epochs, batch_size, max_input_length):
     callback = keras.callbacks.TensorBoard(
         log_dir="./logs",
     )
 
-    model = CnnModel(core_size=50)
+    model = CnnModel(core_size=core_size, max_input_length=max_input_length)
     train_data = read_data(train_path, "train")
-    train_data = handle_input(train_data, max_input_length=500)
 
     teacher_data = read_data(teacher_path, "teacher")
-    teacher_data = handle_input(teacher_data, max_input_length=500)
 
     model.compile(
         loss=keras.losses.MeanSquaredError(),
@@ -66,11 +56,14 @@ def train(train_path, teacher_path):
     model.fit(
         train_data,
         teacher_data,
-        epochs=10,
-        batch_size=10,
+        epochs=epochs,
+        batch_size=batch_size,
         callbacks=callback,
         validation_split=0.2,
+        validation_steps=1,
     )
+
+    model.save("ed_model", include_optimizer=True)
 
 
 def main():
@@ -85,18 +78,40 @@ def main():
     )
 
     parser.add_argument(
-        "-epoches",
+        "-core_size",
+        default=15,
+    )
+    parser.add_argument(
+        "-epochs",
         default=10
     )
 
     parser.add_argument(
-        ""
+        "-max_input_length",
+        default=500,
+    )
+
+    parser.add_argument(
+        "-batch_size",
+        default=20,
+    )
+
+    args = parser.parse_args(["../../data/generate/concat/data_result.dat",
+                              "../../data/generate/concat/teacher_result.dat"]
+    )
+
+    train(
+        **{
+            lst[0]: lst[1]
+            for lst in args._get_kwargs()
+        }
     )
 
 
 if __name__ == '__main__':
-    logger.add(
-        open("./logs/loguru_log.log", "w+", encoding="utf-8")
-    )
-    train("../../data/generate/concat/data_result.dat", "../../data/generate/concat/teacher_result.dat")
-    # train("../../data/origin/before/LINE_100_dbdt.dat", "../../data/origin/before/LINE_100_dbdt.dat")
+    # logger.add(
+    #     open("./logs/loguru_log.log", "w+", encoding="utf-8")
+    # )
+    # train("../../data/generate/concat/data_result.dat", "../../data/generate/concat/teacher_result.dat")
+    # # train("../../data/origin/before/LINE_100_dbdt.dat", "../../data/origin/before/LINE_100_dbdt.dat")
+    main()

@@ -2,7 +2,11 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/data/figures" />
+      <excludeFolder url="file://$MODULE_DIR$/data/generate" />
       <excludeFolder url="file://$MODULE_DIR$/envionments" />
+      <excludeFolder url="file://$MODULE_DIR$/gui/data_generate/data" />
+      <excludeFolder url="file://$MODULE_DIR$/solutions/cnn_coder/logs" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
