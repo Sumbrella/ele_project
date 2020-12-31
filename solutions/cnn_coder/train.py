@@ -11,13 +11,17 @@ from solutions.cnn_coder.model import CnnModel
 from tensorflow.keras import backend as K
 
 
+def data_handle(x):
+    return abs(np.log10(x) / 4)
+
+
 def read_data(data_path, placeholder, max_input_length=500):
     logger.info("Logging data {}...".format(placeholder))
 
     sf = SingleFile(data_path)
     data = []
-    all_point_number = 50
-    # all_point_number = sf.point_number
+    # all_point_number = 50
+    all_point_number = sf.point_number
     # total参数设置进度条的总长度
     with tqdm(total=all_point_number) as pbar:
         pbar.set_description("Reading {}".format(placeholder))
@@ -25,6 +29,7 @@ def read_data(data_path, placeholder, max_input_length=500):
             point = sf.get_one_point()
             one_data = point.get_data()
             one_data = np.array(one_data).reshape(1, -1, 2)
+            one_data = data_handle(one_data)
             length = point.size
             output = np.pad(one_data,
                             pad_width=((0, 0), (0, max_input_length - length), (0, 0)),
@@ -80,25 +85,29 @@ def main():
     parser.add_argument(
         "-core_size",
         default=15,
+        type=int,
     )
     parser.add_argument(
         "-epochs",
-        default=10
+        default=10,
+        type=int,
     )
 
     parser.add_argument(
         "-max_input_length",
         default=500,
+        type=int,
     )
 
     parser.add_argument(
         "-batch_size",
         default=20,
+        type=int,
     )
 
-    args = parser.parse_args(["../../data/generate/concat/data_result.dat",
-                              "../../data/generate/concat/teacher_result.dat"]
-    )
+    args = parser.parse_args()#["../../data/generate/concat/data_result.dat",
+                              #"../../data/generate/concat/teacher_result.dat"]
+    #)
 
     train(
         **{
