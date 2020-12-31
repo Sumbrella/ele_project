@@ -27,7 +27,7 @@ def handle_input(inputs, max_input_length):
         length = input.shape[2]
         output = np.pad(input,
                         pad_width=((0, 0), (0, max_input_length - length), (0, 0)),
-                        constant_values=0,
+                        constant_values=(0, 0),
                         )
         output = np.tile(output, reps=[3, 1, 1])
         outputs.append(output.tolist())
@@ -36,14 +36,24 @@ def handle_input(inputs, max_input_length):
 
 if __name__ == '__main__':
     import numpy as np
+    from ele_common.units import SinglePoint
 
     callbacks = tf.keras.callbacks.TensorBoard("./logs")
 
-    test_x = np.random.randn(10, 1, 250, 2)
-    test_y = np.random.randn(10, 1, 250, 2)
+    # test_x = np.random.randn(10, 1, 250, 2)
+    # test_y = np.random.randn(10, 1, 250, 2)
+    fp = open("../../data/origin/before/LINE_100_dbdt.dat", "r+")
+    fp.readline()
+    fp.readline()
+    point = SinglePoint.from_file(fp)
+
+    test_x = [point.get_data(), point.get_data()]
+    test_x = np.array(test_x).reshape(2, 1, -1, 2)
 
     test_x = handle_input(test_x, 500)
-    test_y = handle_input(test_y, 500)
+    test_y = test_x
+
+    print(test_x[0])
 
     model = CnnModel()
 

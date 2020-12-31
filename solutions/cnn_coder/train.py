@@ -1,3 +1,4 @@
+import numpy as np
 from argparse import ArgumentParser
 from tqdm import tqdm
 from loguru import logger
@@ -19,22 +20,43 @@ def read_data(data_path, placeholder):
             data.append(sf.get_one_point().get_data())
             pbar.update(1)
 
+    data = np.array(data).reshape(all_point_number, 1, -1, 2)
+
     logger.success("{} data read Done!".format(placeholder))
 
     return data
+
+
+def handle_input(inputs, max_input_length):
+    # inputs: (N, H, W, C)
+    outputs = []
+    with tqdm(total=len(inputs)) as pbar:
+        for input in inputs:
+            pbar.set_description("Handling data...")
+            length = input.shape[2]
+            output = np.pad(input,
+                            pad_width=((0, 0), (0, max_input_length - length), (0, 0)),
+                            constant_values=(0, 0),
+                            )
+            output = np.tile(output, reps=[3, 1, 1])
+            outputs.append(output.tolist())
+            pbar.update(1)
+
+    return np.array(outputs)
 
 
 @logger.catch
 def train(train_path, teacher_path):
     callback = keras.callbacks.TensorBoard(
         log_dir="./logs",
-        histogram_freq=1,
-        write_images=True,
     )
 
     model = CnnModel(core_size=50)
     train_data = read_data(train_path, "train")
-    teacher_data = read_data(teacher_path, "teachder")
+    train_data = handle_input(train_data, max_input_length=500)
+
+    teacher_data = read_data(teacher_path, "teacher")
+    teacher_data = handle_input(teacher_data, max_input_length=500)
 
     model.compile(
         loss=keras.losses.MeanSquaredError(),
@@ -44,10 +66,10 @@ def train(train_path, teacher_path):
     model.fit(
         train_data,
         teacher_data,
-        validation_split=0.2,
         epochs=10,
         batch_size=10,
-        callbacks=callback
+        callbacks=callback,
+        validation_split=0.2,
     )
 
 
@@ -68,7 +90,7 @@ def main():
     )
 
     parser.add_argument(
-
+        ""
     )
 
 
@@ -77,4 +99,4 @@ if __name__ == '__main__':
         open("./logs/loguru_log.log", "w+", encoding="utf-8")
     )
     train("../../data/generate/concat/data_result.dat", "../../data/generate/concat/teacher_result.dat")
-
+    # train("../../data/origin/before/LINE_100_dbdt.dat", "../../data/origin/before/LINE_100_dbdt.dat")
