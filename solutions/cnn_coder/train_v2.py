@@ -1,14 +1,12 @@
-import sys
-sys.path.append("../..")
-
 import numpy as np
-from argparse import ArgumentParser
+# from argparse import ArgumentParser
 from tqdm import tqdm
 from loguru import logger
 from tensorflow import keras
 from ele_common.units import SingleFile
-from solutions.cnn_coder.model import CnnModel
+# from solutions.cnn_coder.model import CnnModel
 from tensorflow.keras import backend as K
+from ele_common.units.seg_basic import segnet_basic as model
 
 
 def data_handle(x):
@@ -20,7 +18,7 @@ def read_data(data_path, placeholder, max_input_length=500):
 
     sf = SingleFile(data_path)
     data = []
-    all_point_number = 500
+    all_point_number = 50
     # all_point_number = sf.point_number
     with tqdm(total=all_point_number) as pbar:
         pbar.set_description("Reading {}".format(placeholder))
@@ -34,8 +32,7 @@ def read_data(data_path, placeholder, max_input_length=500):
                             pad_width=((0, 0), (0, max_input_length - length), (0, 0)),
                             constant_values=(0, 0),
                             )
-            if type == "input":
-                output = np.tile(output, reps=[3, 1, 1])
+            output = np.tile(output, reps=[3, 1, 1])
             data.append(output.tolist())
             pbar.update(1)
 
@@ -47,11 +44,9 @@ def train(train_path, teacher_path, core_size, epochs, batch_size, max_input_len
     callback = keras.callbacks.TensorBoard(
         log_dir="./logs",
     )
-    # version 1
-    # model = CnnModel(core_size=core_size, max_input_length=max_input_length)
-    model = CnnModel(output_shape_=(1, max_input_length, 2))
-    train_data = read_data(train_path, "train")
 
+    # model = CnnModel(core_size=core_size, max_input_length=max_input_length)
+    train_data = read_data(train_path, "train")
     teacher_data = read_data(teacher_path, "teacher")
 
     model.compile(
@@ -72,56 +67,5 @@ def train(train_path, teacher_path, core_size, epochs, batch_size, max_input_len
     model.save("ed_model", include_optimizer=True)
 
 
-def main():
-    parser = ArgumentParser()
-
-    parser.add_argument(
-        "train_path",
-    )
-
-    parser.add_argument(
-        "teacher_path",
-    )
-
-    parser.add_argument(
-        "-core_size",
-        default=15,
-        type=int,
-    )
-    parser.add_argument(
-        "-epochs",
-        default=1000,
-        type=int,
-    )
-
-    parser.add_argument(
-        "-max_input_length",
-        default=500,
-        type=int,
-    )
-
-    parser.add_argument(
-        "-batch_size",
-        default=20,
-        type=int,
-    )
-
-    args = parser.parse_args(["../../data/generate/concat/data_result.dat",
-                              "../../data/generate/concat/teacher_result.dat"])
-    # args = parser.parse_args()
-
-    train(
-        **{
-            lst[0]: lst[1]
-            for lst in args._get_kwargs()
-        }
-    )
-
-
 if __name__ == '__main__':
-    # logger.add(
-    #     open("./logs/loguru_log.log", "w+", encoding="utf-8")
-    # )
-    # train("../../data/generate/concat/data_result.dat", "../../data/generate/concat/teacher_result.dat")
-    # # train("../../data/origin/before/LINE_100_dbdt.dat", "../../data/origin/before/LINE_100_dbdt.dat")
-    main()
+    train("../../data/generate/concat/data_result.dat", "../../data/generate/concat/teacher_result.dat")
