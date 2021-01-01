@@ -19,8 +19,8 @@ class CnnModel(tf.keras.Model):
         # self.decoder = Decoder(core_size, max_input_length, name="decoder")
 
         # version 2
-        self.en_blocks = [32, 32, 64, 64, 128]
-        self.de_blocks = [128, 64, 64, 32, 32]
+        self.en_blocks = [32, 32, 64, 64, 128, 128, 256]
+        self.de_blocks = [256, 128, 128, 64, 64, 32, 32]
 
         self.encoder = Encoder(blocks=self.en_blocks, name="encoder", pool_size=(1, 2))
         self.decoder = Decoder(blocks=self.de_blocks, name="decoder", unpool_size=(1, 2))
