@@ -8,11 +8,9 @@ from loguru import logger
 from tensorflow import keras
 from ele_common.units import SingleFile
 from solutions.cnn_coder.model import CnnModel
+from ele_common.functions import data_handle
+from constants import *
 from tensorflow.keras import backend as K
-
-
-def data_handle(x):
-    return abs(np.log10(x) / 4)
 
 
 def read_data(data_path, placeholder, max_input_length=500):
@@ -26,21 +24,12 @@ def read_data(data_path, placeholder, max_input_length=500):
         pbar.set_description("Reading {}".format(placeholder))
         for i in range(all_point_number):
             point = sf.get_one_point()
-            one_data = point.get_data()
-            one_data = np.array(one_data).reshape(1, -1, 2)
-            one_data = data_handle(one_data)
-            length = point.size
-            output = np.pad(one_data,
-                            pad_width=((0, 0), (0, max_input_length - length), (0, 0)),
-                            constant_values=(0, 0),
-                            )
-            if type == "input":
-                output = np.tile(output, reps=[3, 1, 1])
+            x_data, y_data = point.get_data()
+            output = data_handle(x_data, y_data, MAX_INPUT_LENGTH)
             data.append(output.tolist())
             pbar.update(1)
 
     return K.cast_to_floatx(np.array(data))
-
 
 @logger.catch
 def train(train_path, teacher_path, core_size, epochs, batch_size, max_input_length):
@@ -50,10 +39,9 @@ def train(train_path, teacher_path, core_size, epochs, batch_size, max_input_len
     # version 1
     # model = CnnModel(core_size=core_size, max_input_length=max_input_length)
     model = CnnModel(output_shape_=(1, max_input_length, 2))
+
     train_data = read_data(train_path, "train")
-
     teacher_data = read_data(teacher_path, "teacher")
-
     model.compile(
         loss=keras.losses.MeanSquaredError(),
         optimizer="adam",
@@ -90,7 +78,7 @@ def main():
     )
     parser.add_argument(
         "-epochs",
-        default=1000,
+        default=20,
         type=int,
     )
 

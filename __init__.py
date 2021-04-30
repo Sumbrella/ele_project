@@ -1,4 +1,5 @@
-from __future__ import division, absolute_import, print_function
+from __future__ import absolute_import, division, print_function
+import sys
 
 hard_dependencies = ('matplotlib', 'csv', 'loguru', 'numpy', 'empymod', 'scipy', 'sklearn', 'argparse')
 missing_dependencies = []
@@ -14,3 +15,6 @@ if missing_dependencies:
         "Unable to import required dependencies:\n" + "\n".join(missing_dependencies)
     )
 del hard_dependencies, dependency, missing_dependencies
+
+
+sys.path.append(".")

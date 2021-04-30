@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/gui/data_generate/data" />
       <excludeFolder url="file://$MODULE_DIR$/solutions/cnn_coder/logs" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.7" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

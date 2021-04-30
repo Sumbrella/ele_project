@@ -8,7 +8,6 @@ from ele_common.functions import fcheck
 
 
 def concat_dir(dir_path, full_res_path=None, overwrite=True, extension="dat"):
-
     if full_res_path is None:
         full_res_path = os.path.join(dir_path, "result.dat")
 
@@ -44,6 +43,5 @@ def concat_files(files, res_path):
 
 
 if __name__ == '__main__':
-    # concat_dir(dir_path="../../data/generate/data", full_res_path="../../data/generate/concat/data_result.dat")
-    # concat_dir(dir_path="../../data/generate/teacher", full_res_path="../../data/generate/concat/teacher_result.dat")
-    pass
+    concat_dir(dir_path="../../data/generate/teacher", full_res_path="../../data/generate/concat/data_result.dat")
+    concat_dir(dir_path="../../data/generate/data", full_res_path="../../data/generate/concat/teacher_result.dat")

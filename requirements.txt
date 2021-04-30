@@ -1,0 +1,11 @@
+loguru~=0.5.3
+numpy~=1.19.5
+matplotlib~=3.3.0
+pandas~=1.0.4
+tensorflow~=2.4.1
+tqdm~=4.50.2
+tensorboard~=2.4.1
+scipy~=1.5.2
+sklearn~=0.0
+scikit-learn~=0.24.0
+empymod~=2.0.6
